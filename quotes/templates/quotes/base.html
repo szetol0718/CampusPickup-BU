@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Quote of the Day</title>
+</head>
+<body>
+
+    <header>
+        <h1>Quote of the Day</h1>
+        <nav>
+            <a href="{% url 'quote' %}">Home</a> |
+            <a href="{% url 'show_all' %}">Show All</a> |
+            <a href="{% url 'about' %}">About</a>
+        </nav>
+        <hr>
+    </header>
+
+    {% block content %}
+    {% endblock %}
+
+    <footer>
+        <hr>
+        <p><em>Current time: {{ current_time }}</em></p>
+    </footer>
+
+</body>
+</html>
