@@ -44,8 +44,8 @@ def quote(request):
         "image": random.choice(IMAGES),
         "current_time": time.ctime(),
     }
-
-    return render(request, "quotes/quote.html", context)
+    template = "quotes/quote.html"
+    return render(request, template, context)
 
 
 def show_all(request):
@@ -58,8 +58,8 @@ def show_all(request):
         "images": IMAGES,
         "current_time": time.ctime(),
     }
-
-    return render(request, "quotes/show_all.html", context)
+    template = "quotes/show_all.html"
+    return render(request, template, context)
 
 
 def about(request):
@@ -70,5 +70,5 @@ def about(request):
     context = {
         "current_time": time.ctime(),
     }
-
-    return render(request, "quotes/about.html", context)
+    template = "quotes/about.html"
+    return render(request, template, context)
