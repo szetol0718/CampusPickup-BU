@@ -1,29 +1,39 @@
+<!--
+File: base.html
+Author: Louis Szeto (szetol@bu.edu), 1/28/2026
+Description: Base template for the quotes app. Provides header, navigation,
+and shared layout for all pages.
+-->
+
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Quote of the Day</title>
+    <title>Quote of the Day  </title>
+    <link rel="stylesheet" href="{% static 'styles/a1.css' %}">
 </head>
 <body>
 
-    <header>
-        <h1>Quote of the Day</h1>
-        <nav>
-            <a href="{% url 'quote' %}">Home</a> |
-            <a href="{% url 'show_all' %}">Show All</a> |
-            <a href="{% url 'about' %}">About</a>
-        </nav>
-        <hr>
-    </header>
+<header>
+    <h1>Quote of the Day -- Kong Qiu</h1>
 
-    {% block content %}
-    {% endblock %}
+    <nav>
+        <a href="{% url 'quote' %}">Home</a> |
+        <a href="{% url 'show_all' %}">Show All</a> |
+        <a href="{% url 'about' %}">About</a>
+    </nav>
 
-    <footer>
-        <hr>
-        <p><em>Current time: {{ current_time }}</em></p>
-    </footer>
+    <hr>
+</header>
+
+{% block content %}
+{% endblock %}
+
+<footer>
+    <hr>
+    <p><em>Current time: {{ current_time }}</em></p>
+</footer>
 
 </body>
 </html>

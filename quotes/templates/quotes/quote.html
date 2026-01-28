@@ -1,8 +1,21 @@
+<!--
+File: quote.html
+Author: Louis Szeto (szetol@bu.edu), 1/28/2026
+Description: Main page that displays one randomly selected quote and one
+randomly selected image.
+-->
+
 {% extends "quotes/base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="quote-box">
 
+    <img
+        src="{% static image %}"
+        alt="Confucius"
+        class="quote-image"
+    >
 
     <blockquote>
         “{{ quote }}”

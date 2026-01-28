@@ -1,13 +1,30 @@
+<!--
+File: show_all.html
+Author: Louis Szeto (szetol@bu.edu), 1/28/2026
+Description: Page that displays all quotes and all images using loops.
+-->
+
 {% extends "quotes/base.html" %}
+{% load static %}
 
 {% block content %}
 <h2>All Quotes</h2>
 
-<ul>
+<ul class="quote-list">
     {% for q in quotes %}
         <li>“{{ q }}”</li>
     {% endfor %}
 </ul>
 
+<h2>All Images</h2>
 
+<div class="image-gallery">
+    {% for img in images %}
+        <img
+            src="{% static img %}"
+            alt="Confucius"
+            class="gallery-image"
+        >
+    {% endfor %}
+</div>
 {% endblock %}
