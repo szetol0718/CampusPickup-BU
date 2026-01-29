@@ -9,7 +9,7 @@ from django.shortcuts import render
 import random
 import time
 
-
+#quotes list 
 QUOTES = [
     "It does not matter how slowly you go as long as you do not stop.",
     "Our greatest glory is not in never falling, but in rising every time we fall.",
@@ -22,7 +22,7 @@ QUOTES = [
     "Virtue is not left to stand alone. He who practices it will have neighbors.",
     "Better a diamond with a flaw than a pebble without."
 ]
-
+#images list
 IMAGES = [
     "images/i1.jpg",
     "images/i2.jpg",
@@ -32,7 +32,7 @@ IMAGES = [
 
 
 
-
+#handle quote request
 def quote(request):
     """
     Main page:
@@ -40,28 +40,28 @@ def quote(request):
     URL: / and /quote
     """
     context = {
-        "quote": random.choice(QUOTES),
-        "image": random.choice(IMAGES),
+        "quote": random.choice(QUOTES), #randomly select 1 quote from the list
+        "image": random.choice(IMAGES), #randomly select 1 image from the list
         "current_time": time.ctime(),
     }
     template = "quotes/quote.html"
     return render(request, template, context)
 
-
+#handle show_all request
 def show_all(request):
     """
     Show all quotes and images
     URL: /show_all
     """
     context = {
-        "quotes": QUOTES,
-        "images": IMAGES,
+        "quotes": QUOTES, #all quotes
+        "images": IMAGES, #all images
         "current_time": time.ctime(),
     }
     template = "quotes/show_all.html"
     return render(request, template, context)
 
-
+#handle about request
 def about(request):
     """
     About page
