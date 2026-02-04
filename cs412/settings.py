@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'hw', #new app
     'quotes', #assignment 1 app
 
+    "restaurant", #assignment 2 app
+
 ]
 
 MIDDLEWARE = [

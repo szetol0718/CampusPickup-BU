@@ -1,0 +1,50 @@
+<!--
+File: base.html
+Author: Louis Szeto (szetol@bu.edu), 2/3/2026
+Description: Base template for the restaurant website. Provides common
+header, navigation bar, and styling shared across all pages.
+-->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Lee Po Cafe</title>
+
+    <link rel="stylesheet" href="{% static 'styles/a1.css' %}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <h1>Lee Po Cafe</h1>
+    <p class="tagline">Hong Kong Style Cafe</p>
+</header>
+
+<nav class="navbar">
+    <a href="{% url 'restaurant' %}">Home</a>
+    <a href="{% url 'order' %}">Order Online</a>
+</nav>
+
+
+<hr>
+
+
+<main class="content">
+    {% block content %}
+    {% endblock %}
+</main>
+
+
+<hr>
+
+<footer class="footer">
+    <p>
+        Lee Po Cafe |
+        Tuen Mun, Hong Kong 
+    </p>
+</footer>
+
+</body>
+</html>

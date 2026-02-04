@@ -1,0 +1,65 @@
+<!--
+File: main.html
+Author: Louis Szeto (szetol@bu.edu), 2/3/2026
+Description: Main landing page for the restaurant website. Displays
+restaurant information, hours of operation, and photos.
+-->
+
+{% extends "restaurant/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section>
+    <h2>Welcome to Lee Po Cafe</h2>
+
+    <p>
+    Lai Bo Café is one of Tuen Mun’s beloved neighborhood cha chaan tengs, 
+    serving classic Hong Kong comfort food in a warm, no-frills setting. 
+    From silky milk tea and buttery toast to baked pork chop rice and 
+    hearty breakfast sets, it’s the kind of place locals visit daily for affordable,
+    fast, and satisfying meals. If you want to experience authentic Hong Kong café 
+    culture like a true local, Lai Bo Café is definitely worth a stop. 
+    </p>
+</section>
+
+<section>
+    <h3>Hours of Operation</h3>
+
+    <table class="hours-table">
+        <tr>
+            <th>Day</th>
+            <th>Hours</th>
+        </tr>
+        <tr>
+            <td>Monday – Sunday</td>
+            <td>7:00 AM – 5:30 PM</td>
+        </tr>
+        <tr>
+            <td>Thursday</td>
+            <td>closed</td>
+        </tr>
+    </table>
+</section>
+
+<section>
+    <h3>Location</h3>
+
+    <p>
+        22 Hoi Wong Rd<br>
+        Tuen Mun, Hong Kong<br>
+        Phone: +852 2146 4011
+    </p>
+</section>
+
+<section>
+    <h3>Photos</h3>
+    <div class="gallery">
+        <img src="{% static 'images/res.jpg' %}" alt="Restaurant interior" class="image">
+        <img src="{% static 'images/food1.jpg' %}" alt="dish" class="image">
+        <img src="{% static 'images/food2.jpg' %}" alt="dish" class="image">
+    </div>
+</section>
+
+
+{% endblock %}

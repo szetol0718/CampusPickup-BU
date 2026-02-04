@@ -22,4 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('hw/',include ('hw.urls')),  #new app
     path('quotes/',include ('quotes.urls')),  #assignment 1 app
+
+    path('restaurant/', include('restaurant.urls')),  #assignment 2 app
 ]
