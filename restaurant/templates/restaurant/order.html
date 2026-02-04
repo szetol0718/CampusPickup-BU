@@ -10,71 +10,94 @@ daily special, and special instructions. No customer information required.
 
 <section>
     <h2>Order Online</h2>
-    <p>Select your dishes below.</p>
 
     <form method="post" >
         {% csrf_token %}
 
-        <!-- ================= Menu Items ================= -->
-        <fieldset>
-            <legend>Menu</legend>
+        <!-- This is the main menu section -->
+    <div class="card">
+        <h3>Menu</h3>
 
-            <label>
-                <input type="checkbox" name="dim_sum">
-                Dim Sum ($12.99)
-            </label>
+        {% for name, price in menu.items %}
+            <label class="menu-item">
+                <input type="checkbox" name="{{ name|lower|cut:' ' }}">
+                {{ name }} -- ${{ price }}
+            </label><br>
 
-            <label>
-                <input type="checkbox" name="congee">
-                Congee ($8.99)
-            </label>
+            {% if name == "Congee" %}
+                <div class="options">
+                    <p><strong>Congee Options</strong></p>
 
-            <label>
-                <input type="checkbox" name="noodle_soup">
-                Noodle Soup ($7.99)
-            </label>
+                    <label>
+                        Protein:
+                        <select name="congee_protein">
+                            <option value="Plain" selected>Plain</option>
+                            <option value="Chicken (+$1.50)">Chicken (+$1.50)</option>
+                            <option value="Pork (+$1.50)">Pork (+$1.50)</option>
+                            <option value="Fish (+$2.00)">Fish (+$2.00)</option>
+                        </select>
+                    </label>
 
-            <!-- Item with options (required by assignment) -->
-            <div>
-                <label>
-                    <input type="checkbox" name="bbq_pork_bun">
-                    BBQ Pork Bun ($5.99)
-                </label>
+                    <label>
+                        Add-ons:
+                        <select name="congee_addon">
+                            <option value="None" selected>None</option>
+                            <option value="Century Egg (+$1.00)">Century Egg (+$1.00)</option>
+                            <option value="Fried Dough (+$1.00)">Fried Dough (+$1.00)</option>
+                        </select>
+                    </label>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 
-                <label>
-                    Quantity:
-                    <select name="bun_qty">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                    </select>
-                </label>
-            </div>
-        </fieldset>
+        <!--  This is the Daily Special section -->
+    <div class="card">
+        <h3>Daily Special</h3>
 
+        <label>
+            <input type="checkbox" name="daily_special">
+            <strong>{{ daily_special }}</strong>
+            -- ${{ daily_special_price }}
+        </label>
 
-        <!-- ================= Daily Special ================= -->
-        <fieldset>
-            <legend>Daily Special</legend>
+        <input type="hidden" name="daily_special"
+               value="{{ daily_special }}">
+        <input type="hidden" name="daily_special_price"
+               value="{{ daily_special_price }}">
+    </div>
+    
+        <!-- This is the Special Instructions section -->
+    <div class="card">
+        <h3>Special Instructions</h3>
+        <textarea name="special_instructions" rows="4"
+                  placeholder="Less sugar, no onions, extra spicy..."></textarea>
+    </div>
 
-            <label>
-                <input type="checkbox" name="daily_special">
-                <strong>{{ daily_special }}</strong> (${{ daily_special_price }})
-            </label>
+        <!-- This is the Customer Information section -->
+    <div class="card">
+        <h3>Customer Information</h3>
 
-            <input type="hidden" name="daily_special_name" value="{{ daily_special }}">
-            <input type="hidden" name="daily_special_price" value="{{ daily_special_price }}">
-        </fieldset>
+        <label>
+            Name:
+            <input type="text" name="customer_name" required>
+        </label>
 
-        <fieldset>
-            <legend>Special Instructions</legend>
-            <textarea name="special_instructions" rows="4"
-                placeholder="Less sugar, no onions, extra spicy, etc."></textarea>
-        </fieldset>
+        <label>
+            Phone:
+            <input type="tel" name="customer_phone" required>
+        </label>
+
+        <label>
+            Email:
+            <input type="email" name="customer_email" required>
+        </label>
+    </div>
 
         <button type="submit">Place Order</button>
     </form>
 </section>
+
+
 
 {% endblock %}

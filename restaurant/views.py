@@ -12,9 +12,9 @@ DailySpecials = {
 
 Menu = {    
     "Dim Sum": 12.99, 
-    "Congee": 8.99,
     "Noodle Soup": 7.99,
     "BBQ Pork Bun": 5.99,
+    "Congee": 8.99,
 }
 
 
