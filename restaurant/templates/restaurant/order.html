@@ -1,0 +1,80 @@
+<!--
+File: order.html
+Author: Louis Szeto (szetol@bu.edu), 2/4/2026
+Description: Online ordering page for Lee Po Cafe. Displays menu items,
+daily special, and special instructions. No customer information required.
+-->
+
+{% extends "restaurant/base.html" %}
+{% block content %}
+
+<section>
+    <h2>Order Online</h2>
+    <p>Select your dishes below.</p>
+
+    <form method="post" >
+        {% csrf_token %}
+
+        <!-- ================= Menu Items ================= -->
+        <fieldset>
+            <legend>Menu</legend>
+
+            <label>
+                <input type="checkbox" name="dim_sum">
+                Dim Sum ($12.99)
+            </label>
+
+            <label>
+                <input type="checkbox" name="congee">
+                Congee ($8.99)
+            </label>
+
+            <label>
+                <input type="checkbox" name="noodle_soup">
+                Noodle Soup ($7.99)
+            </label>
+
+            <!-- Item with options (required by assignment) -->
+            <div>
+                <label>
+                    <input type="checkbox" name="bbq_pork_bun">
+                    BBQ Pork Bun ($5.99)
+                </label>
+
+                <label>
+                    Quantity:
+                    <select name="bun_qty">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </label>
+            </div>
+        </fieldset>
+
+
+        <!-- ================= Daily Special ================= -->
+        <fieldset>
+            <legend>Daily Special</legend>
+
+            <label>
+                <input type="checkbox" name="daily_special">
+                <strong>{{ daily_special }}</strong> (${{ daily_special_price }})
+            </label>
+
+            <input type="hidden" name="daily_special_name" value="{{ daily_special }}">
+            <input type="hidden" name="daily_special_price" value="{{ daily_special_price }}">
+        </fieldset>
+
+        <fieldset>
+            <legend>Special Instructions</legend>
+            <textarea name="special_instructions" rows="4"
+                placeholder="Less sugar, no onions, extra spicy, etc."></textarea>
+        </fieldset>
+
+        <button type="submit">Place Order</button>
+    </form>
+</section>
+
+{% endblock %}

@@ -1,13 +1,23 @@
 from multiprocessing import context
 import random
+import time
 from django.shortcuts import render
 
-DailySpecials = [
-    "Hong Kong Style French Toast",
-    "Baked Pork Chop Rice",
-    "Milk Tea",
-    "Egg Tart",
-    ]
+DailySpecials = {
+    "Hong Kong Style French Toast": 6.99,
+    "Baked Pork Chop Rice": 12.99,
+    "Milk Tea": 3.99,
+    "Egg Tart": 4.99,
+}
+
+Menu = {    
+    "Dim Sum": 12.99, 
+    "Congee": 8.99,
+    "Noodle Soup": 7.99,
+    "BBQ Pork Bun": 5.99,
+}
+
+
 # Create your views here.
 def restaurant(request):
     """
@@ -15,7 +25,11 @@ def restaurant(request):
     URL: /restaurant/
     """
     template = "restaurant/main.html"
-    return render(request, template)
+
+    context = {
+        "current_time": time.ctime(),
+               }
+    return render(request, template, context)
 
 def order(request):
     """
@@ -24,8 +38,13 @@ def order(request):
     """
 
     template = "restaurant/order.html"
+    special_name = random.choice(list(DailySpecials.keys()))
+    special_price = DailySpecials[special_name]
 
     context = {
-        "daily_specials": random.choices(DailySpecials)
+        "current_time": time.ctime(),
+        "daily_special": special_name,
+        "daily_special_price": special_price,
+        "menu": Menu,
     }
     return render(request, template, context)
