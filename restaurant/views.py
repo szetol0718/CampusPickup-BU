@@ -48,3 +48,35 @@ def order(request):
         "menu": Menu,
     }
     return render(request, template, context)
+
+def confirmation(request):
+    """
+    Order confirmation page for the restaurant app
+    URL: /restaurant/confirmation/
+    """
+
+    template = "restaurant/confirmation.html"
+    if request.POST:
+
+        customer_name = request.POST['customer_name']
+        customer_phone = request.POST['customer_phone']
+        customer_email = request.POST['customer_email']
+        special_instructions = request.POST['special_instructions']
+
+        ordered_items = []
+        total_price = 0.0
+        for item in Menu.keys():
+            if item in request.POST:
+                ordered_items.append((item, Menu[item]))
+                total_price += Menu[item]
+
+    context = {
+        "current_time": time.ctime(),
+        "customer_name": customer_name,
+        "customer_phone": customer_phone,
+        "customer_email": customer_email,
+        "special_instructions": special_instructions,
+        "ordered_items": ordered_items,
+        "total_price": total_price,
+    }
+    return render(request, template, context)

@@ -1,0 +1,52 @@
+<!--
+File: confirmation.html
+Author: Louis Szeto (szetol@bu.edu), 2/4/2026
+Description: Displays ordered items, total price, special instructions,
+and estimated ready time.
+-->
+
+{% extends "restaurant/base.html" %}
+{% block content %}
+
+<section>
+    <h2>Order Confirmation</h2>
+    <p>Thank you for ordering from Lee Po Cafe!</p>
+        <h3>Customer Information</h3>
+    <ul>
+    <li><strong>Name:</strong> {{ customer_name }}</li>
+    <li><strong>Phone:</strong> {{ customer_phone }}</li>
+    <li><strong>Email:</strong> {{ customer_email }}</li>
+    </ul>
+    <h3>Your Items</h3>
+
+    {% if ordered_items %}
+        <table class="items-table">
+            <tr>
+                <th>Item</th>
+                <th>Price</th>
+            </tr>
+
+            {% for item in ordered_items %}
+                <tr>
+                    <td>{{ item.0 }}</td>
+                    <td>${{ item.1 }}</td>
+                </tr>
+            {% endfor %}
+
+            <tr>
+                <td><strong>Total</strong></td>
+                <td><strong>${{ total_price }}</strong></td>
+            </tr>
+        </table>
+    {% else %}
+        <p><em>No items selected.</em></p>
+    {% endif %}
+
+    {% if special_instructions %}
+        <h3>Special Instructions</h3>
+        <p>{{ special_instructions }}</p>
+    {% endif %}
+
+</section>
+
+{% endblock %}
