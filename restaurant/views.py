@@ -65,10 +65,16 @@ def confirmation(request):
 
         ordered_items = []
         total_price = 0.0
+        
         for item in Menu.keys():
             if item in request.POST:
                 ordered_items.append((item, Menu[item]))
                 total_price += Menu[item]
+
+        for item in DailySpecials.keys():
+            if item in request.POST:
+                ordered_items.append((item, DailySpecials[item]))
+                total_price += DailySpecials[item]
 
     context = {
         "current_time": time.ctime(),

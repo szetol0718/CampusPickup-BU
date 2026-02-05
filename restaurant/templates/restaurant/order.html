@@ -56,8 +56,7 @@ daily special, and special instructions. No customer information required.
         <h3>Daily Special</h3>
 
         <label class="menu-item">
-            <input type="checkbox" name="daily_special"
-                   value="{{ daily_special }}">
+            <input type="checkbox" name="{{ daily_special }}">
             <strong>{{ daily_special }}</strong>
             (${{ daily_special_price }})
         </label>
@@ -81,7 +80,7 @@ daily special, and special instructions. No customer information required.
 
         <label>
             Phone:
-            <input type="tel" name="customer_phone" required>
+            <input type="text" name="customer_phone" required>
         </label>
 
         <label>
