@@ -1,0 +1,138 @@
+/*
+File: a2.css
+Author: Louis Szeto (szetol@bu.edu), 2/5/2026
+Description: Simple CSS theme for the Lee Po Cafe restaurant website.
+Uses a light yellow + white color palette and styles cards, tables, forms,
+and image gallery for a clean layout.
+*/
+
+/* ---------- Base / Theme ---------- */
+:root {
+    --bg: #fff4c6;         
+    --card: #ffffff;       
+    --border: #9d9370;    
+    --text: #000000;
+    --muted: #6b6b6b;
+}
+
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.content {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 18px;
+}
+
+.site-header {
+    text-align: center;
+    padding: 22px 16px 10px 16px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar {
+    text-align: center;
+    padding: 12px 10px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar a {
+    padding: 8px 12px;
+    margin: 0 6px;
+    color: var(--text);
+}
+
+.navbar a:hover {
+    background: #fff2b3; /* slightly deeper yellow */
+}
+
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 16px;
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+/* ---------- Tables ---------- */
+.items-table {
+    width: 100%;
+    background: var(--card);
+}
+
+.items-table th,
+.items-table td {
+    border: 1px solid var(--border);
+    padding: 10px;
+    text-align: left;
+    background: #ffffff;
+}
+
+/* ---------- Menu Items / Form ---------- */
+
+.menu-item:hover {
+    background: #fff7cf;
+}
+
+.options {
+    padding: 10px;
+    background: #fffbe9;
+    border: 1px solid var(--border);
+}
+
+label {
+    display: block;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+
+/* Buttons */
+button[type="submit"] {
+    border-radius: 12px;
+    padding: 10px 16px;
+    background: #c58f2a;
+    color: white;
+    font-weight: bold;
+}
+
+/* ---------- Gallery Images ---------- */
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.image {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: white;
+}
+
+/* ---------- Footer ---------- */
+footer {
+    text-align: center;
+    font-size: 0.9em;
+    color: #666;
+}
