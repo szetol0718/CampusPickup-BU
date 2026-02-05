@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'hw', #new app week1
     'quotes', #assignment 1 app
     'formdata' , #new app week2
+    "restaurant", #assignment 2 app
+
 ]
 
 MIDDLEWARE = [

@@ -1,4 +1,4 @@
-# File: views.py
+# File: urls.py
 # Author: Louis Szeto (szetol@bu.edu), 1/28/2026
 # Description: Django URL configuration for the quotes application.
 # Maps URLs to view functions.

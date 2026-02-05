@@ -1,0 +1,99 @@
+<!--
+File: order.html
+Author: Louis Szeto (szetol@bu.edu), 2/4/2026
+Description: Online ordering page for Lee Po Cafe. Displays menu items,
+daily special, and special instructions. No customer information required.
+-->
+
+{% extends "restaurant/base.html" %}
+{% block content %}
+
+<section>
+    <h2>Order Online</h2>
+
+    <form method="post" , action="{% url 'confirmation' %}">
+        {% csrf_token %}
+
+        <!-- This is the main menu section -->
+    <div class="card">
+        <h3>Menu</h3>
+
+        {% for name, price in menu.items %}
+            <label class="menu-item">
+                <input type="checkbox" name="{{ name }}">
+                {{ name }} -- ${{ price }}
+            </label><br>
+
+            {% if name == "Congee" %}
+                <div class="options">
+                    <p><strong>Congee Options</strong></p>
+
+                    <label>
+                        Protein:
+                        <select name="congee_protein">
+                            <option value="Plain" selected>Plain</option>
+                            <option value="Chicken ">Chicken </option>
+                            <option value="Pork">Pork </option>
+                            <option value="Fish">Fish </option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Add-ons:
+                        <select name="congee_addon">
+                            <option value="None" selected>None</option>
+                            <option value="Century Egg">Century Egg </option>
+                            <option value="Fried Dough">Fried Dough </option>
+                        </select>
+                    </label>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+        <!--  This is the Daily Special section -->
+    <div class="card">
+        <h3>Daily Special</h3>
+
+        <label class="menu-item">
+            <input type="checkbox" name="daily_special"
+                   value="{{ daily_special }}">
+            <strong>{{ daily_special }}</strong>
+            (${{ daily_special_price }})
+        </label>
+    </div>
+
+        <!-- This is the Special Instructions section -->
+    <div class="card">
+        <h3>Special Instructions</h3>
+        <textarea name="special_instructions" rows="4"
+                  placeholder="Less sugar, no onions, extra spicy..."></textarea>
+    </div>
+
+        <!-- This is the Customer Information section -->
+    <div class="card">
+        <h3>Customer Information</h3>
+
+        <label>
+            Name:
+            <input type="text" name="customer_name" required>
+        </label>
+
+        <label>
+            Phone:
+            <input type="tel" name="customer_phone" required>
+        </label>
+
+        <label>
+            Email:
+            <input type="email" name="customer_email" required>
+        </label>
+    </div>
+
+        <button type="submit">Place Order</button>
+    </form>
+</section>
+
+
+
+{% endblock %}
