@@ -3,6 +3,7 @@ import random
 import time
 from django.shortcuts import render
 
+# Daily specials
 DailySpecials = {
     "Hong Kong Style French Toast": 5.99,
     "Pineapple Bun with Butter": 3.99,
@@ -10,6 +11,7 @@ DailySpecials = {
     "Egg Tart": 4.99,
 }
 
+# Regular menu items
 Menu = {
     "Satay Beef Noodles": 7.99,
     "Yang Chow Fried Rice": 9.99,
@@ -17,8 +19,6 @@ Menu = {
     "Minced Beef with Egg over Rice": 8.99,
     "Hong Kong Style Milk Tea": 3.99,
 }
-
-
 
 # Create your views here.
 def restaurant(request):
@@ -40,7 +40,8 @@ def order(request):
     """
 
     template = "restaurant/order.html"
-    special_name = random.choice(list(DailySpecials.keys()))
+    # Select a random daily special
+    special_name = random.choice(list(DailySpecials.keys())) 
     special_price = DailySpecials[special_name]
 
     context = {
@@ -68,15 +69,23 @@ def confirmation(request):
         ordered_items = []
         total_price = 0.0
 
+        #check for ordered items in Menu and DailySpecials by looping through keys
         for item in Menu.keys():
             if item in request.POST:
                 ordered_items.append((item, Menu[item]))
-                total_price += Menu[item]
+                total_price += Menu[item] #add price to total
 
         for item in DailySpecials.keys():
             if item in request.POST:
                 ordered_items.append((item, DailySpecials[item]))
-                total_price += DailySpecials[item]
+                total_price += DailySpecials[item] #add price to total
+
+    #calculate ready time between 30 to 60 minutes from now
+    now = time.time()
+    minutes = random.randint(30, 60)
+    ready_time = now + minutes * 60
+    ready_time = time.strftime("%I:%M %p", time.localtime(ready_time))
+
 
     context = {
         "current_time": time.ctime(),
@@ -86,5 +95,6 @@ def confirmation(request):
         "special_instructions": special_instructions,
         "ordered_items": ordered_items,
         "total_price": total_price,
+        "ready_time": ready_time,
     }
     return render(request, template, context)
