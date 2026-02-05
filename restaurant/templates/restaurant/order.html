@@ -11,7 +11,7 @@ daily special, and special instructions. No customer information required.
 <section>
     <h2>Order Online</h2>
 
-    <form method="post" , action="{% url 'confirmation' %}">
+    <form action="{% url 'confirmation' %}" method="post">
         {% csrf_token %}
 
         <!-- This is the main menu section -->
@@ -24,29 +24,29 @@ daily special, and special instructions. No customer information required.
                 {{ name }} -- ${{ price }}
             </label><br>
 
-            {% if name == "Congee" %}
-                <div class="options">
-                    <p><strong>Congee Options</strong></p>
+            {% if name == "Hong Kong Style Milk Tea" %}
+            <div class="options">
+                <p><strong>Milk Tea Options</strong></p>
 
-                    <label>
-                        Protein:
-                        <select name="congee_protein">
-                            <option value="Plain" selected>Plain</option>
-                            <option value="Chicken ">Chicken </option>
-                            <option value="Pork">Pork </option>
-                            <option value="Fish">Fish </option>
-                        </select>
-                    </label>
+                <label>
+                    Sugar Level:
+                    <select name="tea_sugar">
+                        <option value="Regular" selected>Regular</option>
+                        <option value="Less">Less sugar</option>
+                        <option value="Half">Half sugar</option>
+                        <option value="No">No sugar</option>
+                    </select>
+                </label>
 
-                    <label>
-                        Add-ons:
-                        <select name="congee_addon">
-                            <option value="None" selected>None</option>
-                            <option value="Century Egg">Century Egg </option>
-                            <option value="Fried Dough">Fried Dough </option>
-                        </select>
-                    </label>
-                </div>
+                <label>
+                    Ice Level:
+                    <select name="tea_ice">
+                        <option value="Normal" selected>Normal ice</option>
+                        <option value="Less">Less ice</option>
+                        <option value="No">No ice</option>
+                    </select>
+                </label>
+            </div>
             {% endif %}
         {% endfor %}
     </div>
@@ -75,17 +75,17 @@ daily special, and special instructions. No customer information required.
 
         <label>
             Name:
-            <input type="text" name="customer_name" required>
+            <input type="text" name="customer_name">
         </label>
 
         <label>
             Phone:
-            <input type="text" name="customer_phone" required>
+            <input type="text" name="customer_phone">
         </label>
 
         <label>
             Email:
-            <input type="email" name="customer_email" required>
+            <input type="email" name="customer_email">
         </label>
     </div>
 

@@ -4,18 +4,20 @@ import time
 from django.shortcuts import render
 
 DailySpecials = {
-    "Hong Kong Style French Toast": 6.99,
-    "Baked Pork Chop Rice": 12.99,
-    "Milk Tea": 3.99,
+    "Hong Kong Style French Toast": 5.99,
+    "Pineapple Bun with Butter": 3.99,
+    "Spam Indomie Goreng": 6.49,
     "Egg Tart": 4.99,
 }
 
-Menu = {    
-    "Dim Sum": 12.99, 
-    "Noodle Soup": 7.99,
-    "BBQ Pork Bun": 5.99,
-    "Congee": 8.99,
+Menu = {
+    "Satay Beef Noodles": 7.99,
+    "Yang Chow Fried Rice": 9.99,
+    "Beef Chow Fun": 9.49,
+    "Minced Beef with Egg over Rice": 8.99,
+    "Hong Kong Style Milk Tea": 3.99,
 }
+
 
 
 # Create your views here.
@@ -65,7 +67,7 @@ def confirmation(request):
 
         ordered_items = []
         total_price = 0.0
-        
+
         for item in Menu.keys():
             if item in request.POST:
                 ordered_items.append((item, Menu[item]))
