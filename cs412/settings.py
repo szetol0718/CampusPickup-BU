@@ -36,9 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'hw', #new app
+    'hw', #new app week1
     'quotes', #assignment 1 app
-
+    'formdata' , #new app week2
 ]
 
 MIDDLEWARE = [
