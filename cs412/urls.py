@@ -24,4 +24,5 @@ urlpatterns = [
     path('quotes/',include ('quotes.urls')),  #assignment 1 app
     path('formdata/',include ('formdata.urls')),  #week2 new app
     path('restaurant/',include ('restaurant.urls')),  #assignment 12 app
+    path('blog/',include ('blog.urls')),  #week3 new app
 ]
