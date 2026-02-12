@@ -25,4 +25,5 @@ urlpatterns = [
     path('formdata/',include ('formdata.urls')),  #week2 new app
     path('restaurant/',include ('restaurant.urls')),  #assignment 2 app
     path('blog/',include ('blog.urls')),  #week3 new app
+    path('mini_insta/',include ('mini_insta.urls')),  #assignment 3 app
 ]

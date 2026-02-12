@@ -1,0 +1,41 @@
+<!--
+File: base.html
+Author: Louis Szeto (szetol@bu.edu), 2/12/2026
+Description: Base template for mini_insta. Provides standard HTML layout,
+CSS link, header/footer, and a content block for inheriting pages.
+-->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>mini_insta</title>
+
+    <!-- Optional CSS (create later if you want) -->
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+</head>
+
+<body>
+    <header>
+        <h1>mini_insta</h1>
+        <p>A simple Instagram-style demo</p>
+
+        <!-- Navigation links (more later; fine to keep now) -->
+        <nav>
+            <a href="{% url 'show_all_profiles' %}">Profiles</a>
+        </nav>
+        <hr>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <hr>
+        <p>&copy; 2026 Louis Szeto</p>
+    </footer>
+</body>
+</html>

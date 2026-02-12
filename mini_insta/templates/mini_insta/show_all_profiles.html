@@ -1,0 +1,27 @@
+<!--
+File: show_all_profiles.html
+Author: Louis Szeto (szetol@bu.edu), 2/12/2026
+Description: Displays all Profile records with username, display name,
+and profile image.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>All Profiles</h2>
+
+<div class="profiles-grid">
+    {% for p in profiles %}
+        <div class="profile-card">
+            <img src="{{ p.profile_image_url }}"
+                 alt="Profile image for {{ p.username }}"
+                 class="profile-img">
+
+            <h3>{{ p.display_name }}</h3>
+            <p>@{{ p.username }}</p>
+        </div>
+    {% empty %}
+        <p><em>No profiles found. Add some in the Django admin.</em></p>
+    {% endfor %}
+</div>
+{% endblock %}
