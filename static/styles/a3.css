@@ -25,14 +25,14 @@ footer {
     border-bottom: none;
 }
 
-nav a {
+footer a {
     text-decoration: none;
     color: #1a73e8;
     font-weight: bold;
     margin: 0 8px;
 }
 
-nav a:hover {
+footer a:hover {
     text-decoration: underline;
 }
 
@@ -76,8 +76,8 @@ main {
 }
 
 .profile-img-large {
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid #dddddd;
