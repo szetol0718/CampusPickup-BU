@@ -23,6 +23,6 @@ urlpatterns = [
     path('hw/',include ('hw.urls')),  #week1 new app
     path('quotes/',include ('quotes.urls')),  #assignment 1 app
     path('formdata/',include ('formdata.urls')),  #week2 new app
-    path('restaurant/',include ('restaurant.urls')),  #assignment 12 app
+    path('restaurant/',include ('restaurant.urls')),  #assignment 2 app
     path('blog/',include ('blog.urls')),  #week3 new app
 ]
