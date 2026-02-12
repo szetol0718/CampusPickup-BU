@@ -1,0 +1,21 @@
+<!-- 
+ file: show_profile.html
+ Author: Louis Szeto (szetol@bu.edu), 2/12/2026
+    Description: Displays a single Profile record with username, display name,
+    and profile image.
+ -->
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>Profile Detail</h2>
+<div class="profile-detail">
+    <img src="{{ profile.profile_image_url }}"
+         alt="Profile image for {{ profile.username }}"
+         class="profile-img-large">
+
+    <h3>{{ profile.display_name }}</h3>
+    <p>@{{ profile.username }}</p>
+    <p>{{ profile.bio_text }}</p>
+    <p>Joined on {{ profile.join_date }}</p>
+</div>
+{% endblock %}

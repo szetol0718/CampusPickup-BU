@@ -13,9 +13,11 @@ and profile image.
 <div class="profiles-grid">
     {% for p in profiles %}
         <div class="profile-card">
-            <img src="{{ p.profile_image_url }}"
-                 alt="Profile image for {{ p.username }}"
-                 class="profile-img">
+            <a href="{% url 'profile_detail' pk=p.pk %}">
+                <img src="{{ p.profile_image_url }}"
+                     alt="Profile image for {{ p.username }}"
+                     class="profile-img">
+            </a>
 
             <h3>{{ p.display_name }}</h3>
             <p>@{{ p.username }}</p>

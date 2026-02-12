@@ -1,9 +1,10 @@
 # File: views.py
 # Author: Louis Szeto (szetol@bu.edu), 2/12/2026
-# Description: Views for mini_insta. Includes a ListView to display all
-# Profile records using the show_all_profiles.html template.
+# Description: Views for mini_insta. Includes a ListView to display all and 
+# a DetailView to display details of a single Profile record. The ListView
+# displays all Profile records using the show_all_profiles.html template.
 
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from .models import Profile
 
 
@@ -13,3 +14,10 @@ class ProfileListView(ListView):
     model = Profile
     template_name = "mini_insta/show_all_profiles.html"
     context_object_name = "profiles"
+
+class ProfileDetailView(DetailView):
+    """Display details of a single Profile record."""
+
+    model = Profile
+    template_name = "mini_insta/show_profile.html"
+    context_object_name = "profile"
