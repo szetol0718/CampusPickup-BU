@@ -1,0 +1,28 @@
+<!--
+File: create_post_form.html
+Author: Louis Szeto (szetol@bu.edu), 2/12/2026
+Description: Form page for creating a new Post and one Photo.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>Create Post for {{ profile.display_name }}</h2>
+
+<form method="post" action="{% url 'create_post' profile.pk %}">
+    {% csrf_token %}
+
+    <p>
+        <label for="id_caption">Caption:</label><br>
+        {{ form.caption }}
+    </p>
+
+    <p>
+        <label for="id_image_url">Image URL:</label><br>
+        {{ form.image_url }}
+    </p>
+
+    <button type="submit">Submit</button>
+    <a href="{% url 'profile_detail' profile.pk %}">Cancel</a>
+</form>
+{% endblock %}

@@ -18,4 +18,38 @@
     <p>{{ profile.bio_text }}</p>
     <p>Joined on {{ profile.join_date }}</p>
 </div>
+<!-- 
+ Author: Louis Szeto (szetol@bu.edu), 2/18/2026
+    Description: Displays Posts record with all posts and all photos
+ -->
+<h3>Posts</h3>
+
+<div class="posts-grid">
+    {% for post in profile.get_all_posts %}
+        <div class="post-card">
+
+            <a href="{% url 'show_post' post.pk %}">
+                {% with first_photo=post.get_all_photos.first %}
+                    {% if first_photo %}
+                        <img src="{{ first_photo.image_url }}"
+                             alt="Photo for post {{ post.pk }}"
+                             class="post-img">
+                    {% else %}
+                        <img src="https://t4.ftcdn.net/jpg/16/79/44/21/360_F_1679442196_OEs
+                        i0AFKie6hYMBpvmXwwRgRYGV4U6Lz.jpg"
+                             alt="No image available"
+                             class="post-img">
+                    {% endif %}
+                {% endwith %}
+            </a>
+
+            <p class="post-caption">{{ post.caption }}</p>
+            <p class="post-time">{{ post.timestamp }}</p>
+
+            <a href="{% url 'show_post' post.pk %}">View post</a>
+        </div>
+    {% empty %}
+        <p><em>No posts yet.</em></p>
+    {% endfor %}
+</div>
 {% endblock %}

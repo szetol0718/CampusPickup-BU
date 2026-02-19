@@ -20,6 +20,9 @@ CSS link, header/footer, and a content block for inheriting pages.
     <header>
         <h1>Mini Insta</h1>
         <hr>
+        {% if profile %}
+        <a href="{% url 'create_post' profile.pk %}">Create Post</a>
+        {% endif %}
     </header>
 
     <main>
