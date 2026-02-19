@@ -111,8 +111,8 @@ main {
 
 .post-img {
     width: 100%;
-    max-width: 360px;
-    height: 220px;
+    max-width: 420px;
+    height: auto; 
     object-fit: cover;
     border-radius: 10px;
     border: 1px solid #dddddd;

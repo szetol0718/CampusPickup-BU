@@ -9,7 +9,7 @@ Description: Form page for creating a new Post and one Photo.
 {% block content %}
 <h2>Create Post for {{ profile.display_name }}</h2>
 
-<form method="post" action="{% url 'create_post' profile.pk %}">
+<form method="post">
     {% csrf_token %}
 
     <p>

@@ -25,7 +25,7 @@ class ProfileDetailView(DetailView):
     model = Profile
     template_name = "mini_insta/show_profile.html"
     context_object_name = "profile"
-
+    
 # Author: Louis Szeto (szetol@bu.edu), 2/12/2026
 # Description: Views for mini_insta including list/detail views and create post.   
 class PostDetailView(DetailView):
@@ -36,44 +36,35 @@ class PostDetailView(DetailView):
 
 class CreatePostView(CreateView):
     """Create a Post for a specific Profile and also create one Photo."""
+    model = Post
     form_class = CreatePostForm
     template_name = "mini_insta/create_post_form.html"
 
     def get_context_data(self, **kwargs):
-        """Return the dictionary of context variables for use in the template."""
+        """Add the Profile to context so template can build form action + cancel link."""
         context = super().get_context_data(**kwargs)
-
-        pk = self.kwargs["pk"]
+        pk = self.kwargs['pk']
         profile = Profile.objects.get(pk=pk)
-
-        context["profile"] = profile
+        context['profile'] = profile
         return context
 
     def form_valid(self, form):
-        """Handle form submission:
-        - attach Profile FK to Post
-        - save Post
-        - create one Photo using image_url and attach Post FK
-        """
-
-        print(f"CreatePostView.form_valid: cleaned_data={form.cleaned_data}")
-
-        pk = self.kwargs["pk"]
+        """Attach Profile FK to Post, then create one Photo using image_url."""
+        print(f"CreateCommentView.form_valid: form.cleaned_data={form.cleaned_data}")
+        pk = self.kwargs['pk']
         profile = Profile.objects.get(pk=pk)
-
-        # Attach FK before saving Post
         form.instance.profile = profile
 
-        # Save the Post using the superclass (sets self.object)
-        response = super().form_valid(form)
+        post = form.save(commit=False)
+        post.profile = profile
+        post.save()
 
-        # Create ONE Photo for this post (as required by assignment)
-        image_url = form.cleaned_data.get("image_url")
-        if image_url:
-            Photo.objects.create(post=self.object, image_url=image_url)
+        image_url = form.cleaned_data["image_url"]
+        Photo.objects.create(post=post, image_url=image_url)
 
-        return response
+        return super().form_valid(form)
 
     def get_success_url(self):
-        """Redirect to the detail page for the newly created Post."""
-        return reverse("show_post", kwargs={"pk": self.object.pk})
+        """Redirect to the Post detail page after successful creation."""
+        pk = self.kwargs['pk']
+        return reverse("profile_detail", kwargs={"pk": pk})
