@@ -36,30 +36,44 @@ class PostDetailView(DetailView):
 
 class CreatePostView(CreateView):
     """Create a Post for a specific Profile and also create one Photo."""
-    model = Post
     form_class = CreatePostForm
     template_name = "mini_insta/create_post_form.html"
 
     def get_context_data(self, **kwargs):
-        """Add the Profile to context so template can build form action + cancel link."""
+        """Return the dictionary of context variables for use in the template."""
         context = super().get_context_data(**kwargs)
-        profile = Profile.objects.get(pk=self.kwargs["pk"])
+
+        pk = self.kwargs["pk"]
+        profile = Profile.objects.get(pk=pk)
+
         context["profile"] = profile
         return context
 
     def form_valid(self, form):
-        """Attach Profile FK to Post, then create one Photo using image_url."""
-        profile = Profile.objects.get(pk=self.kwargs["pk"])
+        """Handle form submission:
+        - attach Profile FK to Post
+        - save Post
+        - create one Photo using image_url and attach Post FK
+        """
 
-        post = form.save(commit=False)
-        post.profile = profile
-        post.save()
+        print(f"CreatePostView.form_valid: cleaned_data={form.cleaned_data}")
 
-        image_url = form.cleaned_data["image_url"]
-        Photo.objects.create(post=post, image_url=image_url)
+        pk = self.kwargs["pk"]
+        profile = Profile.objects.get(pk=pk)
 
-        return super().form_valid(form)
+        # Attach FK before saving Post
+        form.instance.profile = profile
+
+        # Save the Post using the superclass (sets self.object)
+        response = super().form_valid(form)
+
+        # Create ONE Photo for this post (as required by assignment)
+        image_url = form.cleaned_data.get("image_url")
+        if image_url:
+            Photo.objects.create(post=self.object, image_url=image_url)
+
+        return response
 
     def get_success_url(self):
-        """Redirect to the Post detail page after successful creation."""
+        """Redirect to the detail page for the newly created Post."""
         return reverse("show_post", kwargs={"pk": self.object.pk})

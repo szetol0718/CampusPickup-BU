@@ -27,13 +27,8 @@ class Profile(models.Model):
 class Post(models.Model):
     """Represent an Instagram post."""
 
-    profile = models.ForeignKey(
-        Profile,
-        on_delete=models.CASCADE,
-        related_name="posts"
-    )
-
-    timestamp = models.DateTimeField()
+    profile = models.ForeignKey(Profile,on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
     caption = models.TextField(blank=True)
 
     def __str__(self):
@@ -47,14 +42,9 @@ class Post(models.Model):
 class Photo(models.Model):
     """Represent a photo belonging to a Post."""
 
-    post = models.ForeignKey(
-        Post,
-        on_delete=models.CASCADE,
-        related_name="photos"
-    )
-
+    post = models.ForeignKey(Post,on_delete=models.CASCADE)
     image_url = models.URLField(blank=True)
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Photo for Post {self.post.id}"
