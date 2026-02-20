@@ -94,7 +94,10 @@ main {
         grid-template-columns: 1fr;
     }
 }
-
+/*
+Author: Louis Szeto (szetol@bu.edu), 2/18/2026
+Description: CSS for assignment 4.Posts and photos detail page.
+*/
 .posts-grid, .photos-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

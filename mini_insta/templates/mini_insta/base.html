@@ -11,8 +11,6 @@ CSS link, header/footer, and a content block for inheriting pages.
 <head>
     <meta charset="utf-8">
     <title>mini_insta</title>
-
-    <!-- Optional CSS (create later if you want) -->
     <link rel="stylesheet" href="{% static 'styles/a3.css' %}">
 </head>
 
@@ -27,8 +25,10 @@ CSS link, header/footer, and a content block for inheriting pages.
         {% block content %}
         {% endblock %}
     </main>
-
-    <footer>        
+    
+    <footer>
+        <!--  Author: Louis Szeto (szetol@bu.edu), 2/18/2026
+                New footer to create post if in profile-->        
         {% if profile %}
         <a href="{% url 'create_post' profile.pk %}">Create Post</a>
         {% endif %}

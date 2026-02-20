@@ -9,6 +9,8 @@ from .views import PostDetailView, CreatePostView
 urlpatterns = [
     path("", ProfileListView.as_view(), name="show_all_profiles"),
     path('profile/<int:pk>', ProfileDetailView.as_view(), name='profile_detail'), # show one article
+    # Author: Louis Szeto (szetol@bu.edu), 2/18/2026
+    # Add  path to post and create post
     path("post/<int:pk>/", PostDetailView.as_view(), name="show_post"),
     path("profile/<int:pk>/create_post", CreatePostView.as_view(), name="create_post"),
 ]

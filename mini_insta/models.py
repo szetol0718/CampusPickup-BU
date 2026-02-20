@@ -1,7 +1,7 @@
 # File: models.py
 # Author: Louis Szeto (szetol@bu.edu), 2/12/2026
 # Description: Data models for the mini_insta application. Includes Profile
-# model used to represent user profile information. (2/18/2026)Also added  Post,and Photo.
+# model used to represent user profile information. (2/18/2026) Also added  Post,and Photo.
 from django.db import models
 
 # Create your models here.
@@ -34,7 +34,7 @@ class Post(models.Model):
     def __str__(self):
         return f"Post by {self.profile.username} ({self.id})"
 
-    # Accessor method required by assignment
+    # Accessor method to get all photos
     def get_all_photos(self):
         return Photo.objects.filter(post=self).order_by("timestamp")
 
