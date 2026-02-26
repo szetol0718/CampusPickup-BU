@@ -17,7 +17,7 @@ Description: Displays a single Post with caption/timestamp and all photos.
 <div class="photos-grid">
     {% for photo in post.get_all_photos %}
         <div class="photo-card">
-            <img src="{{ photo.image_url }}"
+            <img src="{{ photo.get_image_url }}"
                  alt="Photo for post {{ post.pk }}"
                  class="post-img">
         </div>

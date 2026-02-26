@@ -49,22 +49,23 @@ class CreatePostView(CreateView):
         return context
 
     def form_valid(self, form):
-        """Attach Profile FK to Post, then create one Photo using image_url."""
-        print(f"CreateCommentView.form_valid: form.cleaned_data={form.cleaned_data}")
-        pk = self.kwargs['pk']
+        pk = self.kwargs["pk"]
         profile = Profile.objects.get(pk=pk)
         form.instance.profile = profile
 
-        post = form.save(commit=False)
-        post.profile = profile
-        post.save()
+        response = super().form_valid(form)
+        #New to add multiple photos
+        files = self.request.FILES.getlist("files")
+        for f in files:
+            Photo.objects.create(post=self.object, image_file=f)
 
-        image_url = form.cleaned_data["image_url"]
-        Photo.objects.create(post=post, image_url=image_url)
-
-        return super().form_valid(form)
+        return response
 
     def get_success_url(self):
         """Redirect to the Post detail page after successful creation."""
         pk = self.kwargs['pk']
         return reverse("profile_detail", kwargs={"pk": pk})
+    #for bebug
+    def form_invalid(self, form):
+        print("CreatePostView form_invalid errors:", form.errors)
+        return super().form_invalid(form)

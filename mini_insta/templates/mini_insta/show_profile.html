@@ -31,7 +31,7 @@
             <a href="{% url 'show_post' post.pk %}">
                 {% with first_photo=post.get_all_photos.first %}
                     {% if first_photo %}
-                        <img src="{{ first_photo.image_url }}"
+                        <img src="{{ first_photo.get_image_url }}"
                              alt="Photo for post {{ post.pk }}"
                              class="post-img">
                     {% else %}

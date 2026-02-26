@@ -45,6 +45,20 @@ class Photo(models.Model):
     post = models.ForeignKey(Post,on_delete=models.CASCADE)
     image_url = models.URLField(blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-
+    image_file = models.ImageField(blank=True) #NEW 2/24/2026 added image field
+    
+    # Author: Louis Szeto, 2/24/2026, modified __str__ and added get_image_url method
     def __str__(self):
-        return f"Photo for Post {self.post.id}"
+        if self.image_url:
+            return f"Photo (url) for Post {self.post.pk}"
+        if self.image_file:
+            return f"Photo (file) for Post {self.post.pk}"
+        return f"Photo (empty) for Post {self.post.pk}"
+
+    def get_image_url(self):
+        """Return the best URL to display this photo (url first, else file)."""
+        if self.image_url:
+            return self.image_url
+        if self.image_file:
+            return self.image_file.url
+        return ""

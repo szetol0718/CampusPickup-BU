@@ -9,8 +9,6 @@ from .models import Post
 class CreatePostForm(forms.ModelForm):
     """Collect inputs needed to create a Post (excluding Profile)."""
 
-    image_url = forms.URLField(label="Image URL", max_length=300)
-
     class Meta:
         model = Post
         fields = ["caption"]

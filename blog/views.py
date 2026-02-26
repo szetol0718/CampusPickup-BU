@@ -36,8 +36,6 @@ class RandomArticleView(DetailView):
     # pick one article at random:
     def get_object(self):
         '''Return one Article object chosen at random.'''
- 
- 
         all_articles = Article.objects.all()
         return random.choice(all_articles)
     

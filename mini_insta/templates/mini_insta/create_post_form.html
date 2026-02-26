@@ -9,7 +9,7 @@ Description: Form page for creating a new Post and one Photo.
 {% block content %}
 <h2>Create Post for {{ profile.display_name }}</h2>
 
-<form method="post">
+<form action="{% url 'create_post' profile.pk %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
     <p>
@@ -18,8 +18,8 @@ Description: Form page for creating a new Post and one Photo.
     </p>
 
     <p>
-        <label for="id_image_url">Image URL:</label><br>
-        {{ form.image_url }}
+        <label for="files">Select Photos</label><br>
+        <input type="file" name="files" id="files" multiple>
     </p>
 
     <button type="submit">Submit</button>

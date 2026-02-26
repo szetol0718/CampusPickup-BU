@@ -28,8 +28,6 @@ class Article(models.Model):
         return reverse('article', kwargs={'pk':self.pk})
     def get_all_comments(self):
         '''Return all of the comments about this article.'''
- 
- 
         comments = Comment.objects.filter(article=self)
         return comments
     
