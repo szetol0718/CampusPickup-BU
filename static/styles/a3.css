@@ -121,31 +121,44 @@ Description: CSS for assignment 4.Posts and photos detail page.
     border: 1px solid #dddddd;
 }
 /*
+File: forms.css
 Author: Louis Szeto (szetol@bu.edu), 2/26/2026
-Description: CSS for assignment 5. All forms and buttons.
+Description: Simple styling for forms, update pages, and action buttons.
 */
-/* simple action links */
-.action-links a {
-    margin-right: 8px;
-    text-decoration: none;
-    font-weight: bold;
-}
 
-.action-links a:hover {
-    text-decoration: underline;
-}
 
-/* simple form spacing */
+/* form container */
 form {
-    margin-top: 10px;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
 }
 
-form p {
-    margin-bottom: 8px;
+
+/* spacing between fields */
+form p,
+.form-field {
+    margin-bottom: 10px;
 }
 
-/* simple buttons */
-button {
-    padding: 4px 8px;
-    cursor: pointer;
+
+/* labels */
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+}
+
+
+/* inputs */
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
 }

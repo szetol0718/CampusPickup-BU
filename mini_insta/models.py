@@ -21,7 +21,7 @@ class Profile(models.Model):
         '''Return a string representation of this object.'''
         return f'{self.username} ({self.display_name})'
 # Author: Louis Szeto (szetol@bu.edu), 2/26/2026
-# Description: Added more methods for accessing posts, followers, following
+# Description: Added more methods for accessing posts, followers, following, and also feed.
     def get_all_posts(self):
         return Post.objects.filter(profile=self).order_by("-timestamp")
     def get_absolute_url(self):
@@ -44,6 +44,15 @@ class Profile(models.Model):
     def get_num_following(self):
         """Return number of profiles being followed."""
         return Follow.objects.filter(follower_profile=self).count()
+    def get_post_feed(self):
+        """Return a QuerySet of Posts from Profiles that this Profile follows."""
+        following_profiles = Follow.objects.filter(
+            follower_profile=self
+        ).values_list("profile")
+
+        return Post.objects.filter(
+            profile__in=following_profiles
+        ).order_by("-timestamp")
     
 # Description: Additional models for mini_insta Assignment 4.
 class Post(models.Model):

@@ -14,7 +14,7 @@ from .forms import CreatePostForm, UpdateProfileForm
 
 class ProfileListView(ListView):
     """Display a list of all Profile records."""
-
+    
     model = Profile
     template_name = "mini_insta/show_all_profiles.html"
     context_object_name = "profiles"
@@ -100,7 +100,8 @@ class UpdatePostView(UpdateView):
         """After updating, redirect back to this Post detail page."""
         return reverse("show_post", kwargs={"pk": self.object.pk})
 # Author: Louis Szeto (szetol@bu.edu), 2/26/2026
-# Description: Views for mini_insta toshow follwers and following.
+# Description: Views for mini_insta to show follwers, following of a profile and also 
+# the feed of posts from followed profiles.
 class ShowFollowersDetailView(DetailView):
     """Show the followers of a Profile."""
     model = Profile
@@ -113,3 +114,19 @@ class ShowFollowingDetailView(DetailView):
     model = Profile
     template_name = "mini_insta/show_following.html"
     context_object_name = "profile"
+
+class PostFeedListView(ListView):
+    """Display the feed for one Profile (posts from followed profiles)."""
+    template_name = "mini_insta/show_feed.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        """Return the Posts to display in the feed."""
+        profile = Profile.objects.get(pk=self.kwargs["pk"])
+        return profile.get_post_feed()
+
+    def get_context_data(self, **kwargs):
+        """Add the Profile to context for navigation links."""
+        context = super().get_context_data(**kwargs)
+        context["profile"] = Profile.objects.get(pk=self.kwargs["pk"])
+        return context

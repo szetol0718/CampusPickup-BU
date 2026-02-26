@@ -1,0 +1,65 @@
+<!--
+File: show_feed.html
+Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+Description: Displays a post feed for a Profile (posts from followed profiles).
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>Feed</h2>
+
+<p>
+    <a href="{% url 'profile_detail' profile.pk %}">Back to Profile</a>
+</p>
+
+{% for post in posts %}
+    <div class="post-card">
+        <div class="post-header">
+            <img src="{{ post.profile.profile_image_url }}"
+                 alt="Profile image"
+                 class="profile-img">
+            <strong>
+                <a href="{% url 'profile_detail' post.profile.pk %}">
+                    {{ post.profile.display_name }}
+                </a>
+            </strong>
+        </div>
+
+        {% with first_photo=post.get_all_photos.first %}
+            {% if first_photo and first_photo.get_image_url %}
+                <a href="{% url 'show_post' post.pk %}">
+                    <img src="{{ first_photo.get_image_url }}"
+                         alt="Post photo"
+                         class="post-img">
+                </a>
+            {% else %}
+                <img src="https://via.placeholder.com/600x400?text=No+Image"
+                     alt="No image"
+                     class="post-img">
+            {% endif %}
+        {% endwith %}
+
+        <!-- Likes -->
+        <p><strong>{{ post.get_likes.count }}</strong> likes</p>
+
+        <!-- Caption -->
+        <p>{{ post.caption }}</p>
+
+        <!-- Comments -->
+        <div class="comments">
+            {% for c in post.get_all_comments %}
+                <p><strong>{{ c.profile.username }}</strong>: {{ c.text }}</p>
+            {% empty %}
+                <p><em>No comments.</em></p>
+            {% endfor %}
+        </div>
+
+        <p>
+            <a href="{% url 'show_post' post.pk %}">View post</a>
+        </p>
+    </div>
+{% empty %}
+    <p><em>No posts in your feed yet. Follow someone to see posts here.</em></p>
+{% endfor %}
+{% endblock %}
