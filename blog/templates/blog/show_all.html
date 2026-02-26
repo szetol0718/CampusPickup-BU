@@ -11,12 +11,13 @@
     {% for a in articles %}
     <article>
  
- 
-        {% if a.image_url %}
         <a href="{% url 'article' a.pk %}">
-        <img src="{{a.image_url}}" alt="{{a.image_url}}">
-        </a>
+        {% if a.image_file %}
+        <img src="{{a.image_file.url}}" alt="">
+        {% else %}
+        No image
         {% endif %}
+        </a>
         
         <div>
         <h2>{{a.title}}</h2>
