@@ -8,7 +8,7 @@ from django.views.generic import ListView, DetailView
 from .models import Profile, Post, Photo
 import time
 from django.urls import reverse
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, DeleteView
 from .forms import CreatePostForm, UpdateProfileForm
 
 
@@ -71,10 +71,31 @@ class CreatePostView(CreateView):
         return super().form_invalid(form)
     
 # Author: Louis Szeto (szetol@bu.edu), 2/25/2026
-# Description: Views for mini_insta Updating profile.    
+# Description: Views for mini_insta Updating profile, deleting post, and updating post
 class UpdateProfileView(UpdateView):
     """Update an existing Profile."""
     model = Profile
     form_class = UpdateProfileForm
     template_name = "mini_insta/update_profile_form.html"
     context_object_name = "profile"
+
+class DeletePostView(DeleteView):
+    """Delete a Post after confirmation."""
+    model = Post
+    template_name = "mini_insta/delete_post_form.html"
+    context_object_name = "post"
+
+    def get_success_url(self):
+        """After deletion, redirect to the Profile page of the post owner."""
+        return reverse("profile_detail", kwargs={"pk": self.get_object().profile.pk})
+
+class UpdatePostView(UpdateView):
+    """Update the caption of a Post."""
+    model = Post
+    fields = ["caption"]
+    template_name = "mini_insta/update_post_form.html"
+    context_object_name = "post"
+
+    def get_success_url(self):
+        """After updating, redirect back to this Post detail page."""
+        return reverse("show_post", kwargs={"pk": self.object.pk})

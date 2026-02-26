@@ -120,3 +120,32 @@ Description: CSS for assignment 4.Posts and photos detail page.
     border-radius: 10px;
     border: 1px solid #dddddd;
 }
+/*
+Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+Description: CSS for assignment 5. All forms and buttons.
+*/
+/* simple action links */
+.action-links a {
+    margin-right: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.action-links a:hover {
+    text-decoration: underline;
+}
+
+/* simple form spacing */
+form {
+    margin-top: 10px;
+}
+
+form p {
+    margin-bottom: 8px;
+}
+
+/* simple buttons */
+button {
+    padding: 4px 8px;
+    cursor: pointer;
+}

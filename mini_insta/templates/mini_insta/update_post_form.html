@@ -1,0 +1,26 @@
+<!--
+File: update_post_form.html
+Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+Description: Form page to update the caption of an existing Post.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>Update Post</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label for="id_caption">Caption:</label><br>
+        {{ form.caption }}
+    </p>
+
+    <button type="submit">Save</button>
+</form>
+
+<form method="get" action="{% url 'show_post' post.pk %}">
+    <button type="submit">Cancel</button>
+</form>
+{% endblock %}
