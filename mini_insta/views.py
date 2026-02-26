@@ -99,3 +99,17 @@ class UpdatePostView(UpdateView):
     def get_success_url(self):
         """After updating, redirect back to this Post detail page."""
         return reverse("show_post", kwargs={"pk": self.object.pk})
+# Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+# Description: Views for mini_insta toshow follwers and following.
+class ShowFollowersDetailView(DetailView):
+    """Show the followers of a Profile."""
+    model = Profile
+    template_name = "mini_insta/show_followers.html"
+    context_object_name = "profile"
+
+
+class ShowFollowingDetailView(DetailView):
+    """Show who a Profile is following."""
+    model = Profile
+    template_name = "mini_insta/show_following.html"
+    context_object_name = "profile"

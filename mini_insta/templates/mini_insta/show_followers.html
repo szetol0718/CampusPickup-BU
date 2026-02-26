@@ -1,0 +1,23 @@
+<!--
+File: show_followers.html
+Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+Description: Displays followers for a Profile.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>Followers of {{ profile.display_name }}</h2>
+
+{% for p in profile.get_followers %}
+    <p>
+        <a href="{% url 'profile_detail' p.pk %}">
+            {{ p.display_name }} (@{{ p.username }})
+        </a>
+    </p>
+{% empty %}
+    <p><em>No followers.</em></p>
+{% endfor %}
+
+<p><a href="{% url 'profile_detail' profile.pk %}">Back</a></p>
+{% endblock %}

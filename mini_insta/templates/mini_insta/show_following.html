@@ -1,0 +1,23 @@
+<!--
+File: show_following.html
+Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+Description: Displays who a Profile is following.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>{{ profile.display_name }} is Following</h2>
+
+{% for p in profile.get_following %}
+    <p>
+        <a href="{% url 'profile_detail' p.pk %}">
+            {{ p.display_name }} (@{{ p.username }})
+        </a>
+    </p>
+{% empty %}
+    <p><em>Not following anyone.</em></p>
+{% endfor %}
+
+<p><a href="{% url 'profile_detail' profile.pk %}">Back</a></p>
+{% endblock %}

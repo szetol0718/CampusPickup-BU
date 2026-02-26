@@ -15,6 +15,19 @@
 
     <h3>{{ profile.display_name }}</h3>
     <p>@{{ profile.username }}</p>
+    <!-- 
+ Author: Louis Szeto (szetol@bu.edu), 2/16/2026
+Description: Displays followers and following.
+ -->
+    <p>
+    <a href="{% url 'show_followers' profile.pk %}">
+        Followers: {{ profile.get_num_followers }}
+    </a>
+    |
+    <a href="{% url 'show_following' profile.pk %}">
+        Following: {{ profile.get_num_following }}
+    </a>
+    </p>
     <p>{{ profile.bio_text }}</p>
     <p>Joined on {{ profile.join_date }}</p>
     <a href="{% url 'update_profile' profile.pk %}">Update Profile</a>

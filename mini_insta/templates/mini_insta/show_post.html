@@ -28,7 +28,17 @@ Description: Displays a single Post with caption/timestamp and all photos.
         <p><em>No photos for this post.</em></p>
     {% endfor %}
 </div>
+<p><strong>{{ post.get_likes.count }}</strong> likes</p>
+<h3>Comments</h3>
 
+{% for c in post.get_all_comments %}
+    <p>
+        <strong>{{ c.profile.username }}</strong>:
+        {{ c.text }}
+    </p>
+{% empty %}
+    <p><em>No comments yet.</em></p>
+{% endfor %}
 <p>
     <a href="{% url 'profile_detail' post.profile.pk %}">Back to profile</a>
 </p>
