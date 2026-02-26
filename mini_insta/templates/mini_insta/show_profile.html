@@ -17,6 +17,7 @@
     <p>@{{ profile.username }}</p>
     <p>{{ profile.bio_text }}</p>
     <p>Joined on {{ profile.join_date }}</p>
+    <a href="{% url 'update_profile' profile.pk %}">Update Profile</a>
 </div>
 <!-- 
  Author: Louis Szeto (szetol@bu.edu), 2/18/2026

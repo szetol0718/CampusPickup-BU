@@ -5,7 +5,7 @@
 
 from django.urls import path
 from .views import ProfileListView, ProfileDetailView
-from .views import PostDetailView, CreatePostView
+from .views import PostDetailView, CreatePostView, UpdateProfileView
 urlpatterns = [
     path("", ProfileListView.as_view(), name="show_all_profiles"),
     path('profile/<int:pk>', ProfileDetailView.as_view(), name='profile_detail'), # show one article
@@ -13,4 +13,7 @@ urlpatterns = [
     # Add  path to post and create post
     path("post/<int:pk>/", PostDetailView.as_view(), name="show_post"),
     path("profile/<int:pk>/create_post", CreatePostView.as_view(), name="create_post"),
+    # Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+    # Add  path to update profile
+    path("profile/<int:pk>/update", UpdateProfileView.as_view(), name="update_profile"),
 ]

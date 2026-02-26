@@ -8,8 +8,8 @@ from django.views.generic import ListView, DetailView
 from .models import Profile, Post, Photo
 import time
 from django.urls import reverse
-from django.views.generic import CreateView
-from .forms import CreatePostForm
+from django.views.generic import CreateView, UpdateView
+from .forms import CreatePostForm, UpdateProfileForm
 
 
 class ProfileListView(ListView):
@@ -26,7 +26,7 @@ class ProfileDetailView(DetailView):
     template_name = "mini_insta/show_profile.html"
     context_object_name = "profile"
     
-# Author: Louis Szeto (szetol@bu.edu), 2/12/2026
+# Author: Louis Szeto (szetol@bu.edu), 2/18/2026
 # Description: Views for mini_insta including list/detail views and create post.   
 class PostDetailView(DetailView):
     """Display a single Post and its photos."""
@@ -69,3 +69,12 @@ class CreatePostView(CreateView):
     def form_invalid(self, form):
         print("CreatePostView form_invalid errors:", form.errors)
         return super().form_invalid(form)
+    
+# Author: Louis Szeto (szetol@bu.edu), 2/25/2026
+# Description: Views for mini_insta Updating profile.    
+class UpdateProfileView(UpdateView):
+    """Update an existing Profile."""
+    model = Profile
+    form_class = UpdateProfileForm
+    template_name = "mini_insta/update_profile_form.html"
+    context_object_name = "profile"

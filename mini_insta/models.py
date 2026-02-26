@@ -3,6 +3,7 @@
 # Description: Data models for the mini_insta application. Includes Profile
 # model used to represent user profile information. (2/18/2026) Also added  Post,and Photo.
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 class Profile(models.Model):
@@ -21,6 +22,9 @@ class Profile(models.Model):
         return f'{self.username} ({self.display_name})'
     def get_all_posts(self):
         return Post.objects.filter(profile=self).order_by("-timestamp")
+    def get_absolute_url(self):
+        """Return the URL for this Profile detail page."""
+        return reverse("profile_detail", kwargs={"pk": self.pk})
 
     
 # Description: Additional models for mini_insta Assignment 4.
@@ -46,7 +50,7 @@ class Photo(models.Model):
     image_url = models.URLField(blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     image_file = models.ImageField(blank=True) #NEW 2/24/2026 added image field
-    
+
     # Author: Louis Szeto, 2/24/2026, modified __str__ and added get_image_url method
     def __str__(self):
         if self.image_url:
