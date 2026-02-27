@@ -1,0 +1,33 @@
+<!--
+File: update_profile_form.html
+Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+Description: Form page to update an existing Profile record.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>Update Profile</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label for="id_display_name">Display name:</label><br>
+        {{ form.display_name }}
+    </p>
+
+    <p>
+        <label for="id_profile_image_url">Profile image URL:</label><br>
+        {{ form.profile_image_url }}
+    </p>
+
+    <p>
+        <label for="id_bio_text">Bio:</label><br>
+        {{ form.bio_text }}
+    </p>
+
+    <button type="submit">Save</button>
+    <a href="{% url 'profile_detail' profile.pk %}">Cancel</a>
+</form>
+{% endblock %}

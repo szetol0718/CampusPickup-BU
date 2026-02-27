@@ -120,3 +120,45 @@ Description: CSS for assignment 4.Posts and photos detail page.
     border-radius: 10px;
     border: 1px solid #dddddd;
 }
+/*
+File: forms.css
+Author: Louis Szeto (szetol@bu.edu), 2/26/2026
+Description: Simple styling for forms, update pages, and action buttons.
+*/
+
+
+/* form container */
+form {
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+}
+
+
+/* spacing between fields */
+form p,
+.form-field {
+    margin-bottom: 10px;
+}
+
+
+/* labels */
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+}
+
+
+/* inputs */
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
