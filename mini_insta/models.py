@@ -4,6 +4,7 @@
 # model used to represent user profile information. (2/18/2026) Also added  Post,and Photo.
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Profile(models.Model):
@@ -16,6 +17,12 @@ class Profile(models.Model):
     bio_text = models.TextField(blank=True)
     join_date = models.DateTimeField()
     profile_image_url = models.URLField(blank=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        default=1,            # use admin user id as default for migration
+        related_name="profiles",
+    )
     
     def __str__(self):
         '''Return a string representation of this object.'''

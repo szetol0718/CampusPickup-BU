@@ -30,7 +30,13 @@ Description: Displays followers and following.
     </p>
     <p>{{ profile.bio_text }}</p>
     <p>Joined on {{ profile.join_date }}</p>
-    <a href="{% url 'update_profile' profile.pk %}">Update Profile</a>
+    {% if user.is_authenticated and profile.user == user %}
+    <p>
+        <a href="{% url 'update_profile' %}">Update Profile</a> |
+        <a href="{% url 'create_post' %}">Create Post</a> |
+        <a href="{% url 'show_feed' %}">View Feed</a>
+    </p>
+    {% endif %}
 </div>
 <!-- 
  Author: Louis Szeto (szetol@bu.edu), 2/18/2026

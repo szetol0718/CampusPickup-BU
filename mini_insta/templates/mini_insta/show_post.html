@@ -8,10 +8,12 @@ Description: Displays a single Post with caption/timestamp and all photos.
 
 {% block content %}
 <h2>Post</h2>
-<div class="action-links">
-    <a href="{% url 'update_post' post.pk %}">Update</a> |
-    <a href="{% url 'delete_post' post.pk %}">Delete</a>
-</div>
+{% if user.is_authenticated and post.profile.user == user %}
+    <div class="action-links">
+        <a href="{% url 'update_post' post.pk %}">Update</a>
+        <a href="{% url 'delete_post' post.pk %}">Delete</a>
+    </div>
+{% endif %}
 <p><strong>Caption:</strong> {{ post.caption }}</p>
 <p><strong>Timestamp:</strong> {{ post.timestamp }}</p>
 

@@ -29,12 +29,20 @@ CSS link, header/footer, and a content block for inheriting pages.
     <footer>
         <!--  Author: Louis Szeto (szetol@bu.edu), 2/18/2026
                 New footer to create post if in profile-->        
-        {% if profile %}
-        <a href="{% url 'show_feed' profile.pk %}">Home</a>
-        <a href="{% url 'search' profile.pk %}">Search</a>
-        <a href="{% url 'create_post' profile.pk %}">Create Post</a>
-        {% endif %}
-        <a href="{% url 'show_all_profiles' %}">Profiles</a>
+            <nav>
+                <a href="{% url 'show_all_profiles' %}">Profiles</a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'show_feed' %}">Home</a>
+                    <a href="{% url 'my_profile' %}">My Profile</a>
+                    <a href="{% url 'search' %}">Search</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                    <span>Logged in as {{ user.username }}</span>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <span>Not logged in</span>
+                {% endif %}
+            </nav>
     </footer>
 </body>
 </html>
