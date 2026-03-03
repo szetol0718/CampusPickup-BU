@@ -1,0 +1,20 @@
+<!--
+File: login.html
+Author: Louis Szeto (szetol@bu.edu), 3/3/2026
+Description: Login page for mini_insta using Django auth LoginView.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+<h2>Login</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <input type="hidden" name="next" value="{% url 'show_all_profiles' %}">
+
+    <button type="submit">Login</button>
+</form>
+{% endblock %}

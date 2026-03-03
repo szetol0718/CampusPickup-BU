@@ -8,6 +8,9 @@ from .views import PostFeedListView, ProfileListView, ProfileDetailView
 from .views import PostDetailView, CreatePostView, UpdateProfileView, SearchView
 from .views import DeletePostView, UpdatePostView, ShowFollowersDetailView, ShowFollowingDetailView
 from .views import MyProfileDetailView
+from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
+
 urlpatterns = [
     path("", ProfileListView.as_view(), name="show_all_profiles"),
     path('profile/<int:pk>', ProfileDetailView.as_view(), name='profile_detail'), # show one article
@@ -32,5 +35,11 @@ urlpatterns = [
      path("profile/search", SearchView.as_view(), name="search"),   
      path("profile/update", UpdateProfileView.as_view(), name="update_profile"),
      path("profile", MyProfileDetailView.as_view(), name="my_profile"),
+     path("login/",auth_views.LoginView.as_view(template_name="mini_insta/login.html"),
+        name="login"),
+    path("logout/",auth_views.LogoutView.as_view(next_page="logout_confirmation"),
+        name="logout"),
+    path("logout_confirmation/",TemplateView.as_view(template_name="mini_insta/logged_out.html"),
+        name="logout_confirmation"),
 
 ]

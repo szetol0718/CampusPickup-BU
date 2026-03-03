@@ -36,7 +36,10 @@ CSS link, header/footer, and a content block for inheriting pages.
                     <a href="{% url 'show_feed' %}">Home</a>
                     <a href="{% url 'my_profile' %}">My Profile</a>
                     <a href="{% url 'search' %}">Search</a>
-                    <a href="{% url 'logout' %}">Logout</a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                    <button type="submit">Logout</button>
+                    </form>
                     <span>Logged in as {{ user.username }}</span>
                 {% else %}
                     <a href="{% url 'login' %}">Login</a>

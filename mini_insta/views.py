@@ -15,12 +15,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 class MyLoginRequiredMixin(LoginRequiredMixin):
     """Require login and provide helper to get the logged-in user's Profile."""
-    login_url = "/accounts/login/"
-
+    def get_login_url(self):
+        return reverse("login")
+    
     def get_my_profile(self):
         """Return the Profile associated with the logged-in user."""
         return get_object_or_404(Profile, user=self.request.user)
-
+    
 class ProfileListView(ListView):
     """Display a list of all Profile records."""
     
@@ -193,6 +194,9 @@ class SearchView(MyLoginRequiredMixin, ListView):
 
         return context
 
+# Author: Louis Szeto (szetol@bu.edu), 3/3/2026
+# Description: Views for mini_insta to show my profile according to user and login.
+# Also modified other views related to adjustment of profile or posts requires user login.
 class MyProfileDetailView(MyLoginRequiredMixin, DetailView):
     """Show the logged-in user's profile."""
     model = Profile
