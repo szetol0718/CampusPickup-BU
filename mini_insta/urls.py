@@ -5,7 +5,7 @@
 
 from django.urls import path
 from .views import PostFeedListView, ProfileListView, ProfileDetailView
-from .views import PostDetailView, CreatePostView, UpdateProfileView
+from .views import PostDetailView, CreatePostView, UpdateProfileView, SearchView
 from .views import DeletePostView, UpdatePostView, ShowFollowersDetailView, ShowFollowingDetailView
 urlpatterns = [
     path("", ProfileListView.as_view(), name="show_all_profiles"),
@@ -23,5 +23,7 @@ urlpatterns = [
      name="show_followers"),
      path("profile/<int:pk>/following", ShowFollowingDetailView.as_view(),
      name="show_following"),
-     path("profile/<int:pk>/feed", PostFeedListView.as_view(), name="show_feed"),         
+     # Also added path to show feed and search.
+     path("profile/<int:pk>/feed", PostFeedListView.as_view(), name="show_feed"),
+     path("profile/<int:pk>/search", SearchView.as_view(), name="search"),            
 ]

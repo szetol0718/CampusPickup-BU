@@ -10,6 +10,7 @@ import time
 from django.urls import reverse
 from django.views.generic import CreateView, UpdateView, DeleteView
 from .forms import CreatePostForm, UpdateProfileForm
+from django.shortcuts import render
 
 
 class ProfileListView(ListView):
@@ -101,7 +102,7 @@ class UpdatePostView(UpdateView):
         return reverse("show_post", kwargs={"pk": self.object.pk})
 # Author: Louis Szeto (szetol@bu.edu), 2/26/2026
 # Description: Views for mini_insta to show follwers, following of a profile and also 
-# the feed of posts from followed profiles.
+# the feed of posts from followed profiles. Also added search view to search for profiles and posts.
 class ShowFollowersDetailView(DetailView):
     """Show the followers of a Profile."""
     model = Profile
@@ -129,4 +130,54 @@ class PostFeedListView(ListView):
         """Add the Profile to context for navigation links."""
         context = super().get_context_data(**kwargs)
         context["profile"] = Profile.objects.get(pk=self.kwargs["pk"])
+        return context
+    
+class SearchView(ListView):
+    """Search Profiles and Posts."""
+    template_name = "mini_insta/search_results.html"
+    context_object_name = "posts"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Show search page if no query."""
+        query = self.request.GET.get("query", "").strip()
+
+        if not query:
+            profile = Profile.objects.get(pk=self.kwargs["pk"])
+            return render(request, "mini_insta/search.html", {
+                "profile": profile
+            })
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        """Return matching posts."""
+        query = self.request.GET.get("query", "").strip()
+
+        return Post.objects.filter(
+            caption__icontains=query
+        ).order_by("-timestamp")
+
+    def get_context_data(self, **kwargs):
+        """Add profiles + posts results."""
+        context = super().get_context_data(**kwargs)
+
+        profile = Profile.objects.get(pk=self.kwargs["pk"])
+        query = self.request.GET.get("query", "").strip()
+
+        # Posts (already filtered)
+        matching_posts = self.get_queryset()
+
+        # Profiles 
+        by_username = Profile.objects.filter(username__icontains=query)
+        by_display = Profile.objects.filter(display_name__icontains=query)
+        by_bio = Profile.objects.filter(bio_text__icontains=query)
+
+        # combine and remove duplicates
+        matching_profiles = (by_username | by_display | by_bio).distinct()
+
+        context["profile"] = profile
+        context["query"] = query
+        context["posts"] = matching_posts
+        context["profiles"] = matching_profiles
+
         return context
