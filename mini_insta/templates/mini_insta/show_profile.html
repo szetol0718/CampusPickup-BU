@@ -37,6 +37,13 @@ Description: Displays followers and following.
         <a href="{% url 'show_feed' %}">View Feed</a>
     </p>
     {% endif %}
+    {% if user.is_authenticated and profile.user != user %}
+        {% if profile in my_profile.get_following %}
+            <a href="{% url 'delete_follow' profile.pk %}">Unfollow</a>
+        {% else %}
+            <a href="{% url 'follow_profile' profile.pk %}">Follow</a>
+        {% endif %}
+    {% endif %}
 </div>
 <!-- 
  Author: Louis Szeto (szetol@bu.edu), 2/18/2026

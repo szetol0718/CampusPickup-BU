@@ -31,6 +31,13 @@ Description: Displays a single Post with caption/timestamp and all photos.
     {% endfor %}
 </div>
 <p><strong>{{ post.get_likes.count }}</strong> likes</p>
+{% if user.is_authenticated and post.profile != my_profile %}
+    {% if i_liked %}
+        <a href="{% url 'delete_like' post.pk %}">Unlike</a>
+    {% else %}
+        <a href="{% url 'like_post' post.pk %}">Like</a>
+    {% endif %}
+{% endif %}
 <h3>Comments</h3>
 
 {% for c in post.get_all_comments %}

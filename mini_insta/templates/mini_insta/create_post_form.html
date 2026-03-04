@@ -9,7 +9,7 @@ Description: Form page for creating a new Post and one Photo.
 {% block content %}
 <h2>Create Post for {{ profile.display_name }}</h2>
 
-<form action="{% url 'create_post' profile.pk %}" method="POST" enctype="multipart/form-data">
+<form action="{% url 'create_post' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
     <p>
@@ -23,6 +23,6 @@ Description: Form page for creating a new Post and one Photo.
     </p>
 
     <button type="submit">Submit</button>
-    <a href="{% url 'profile_detail' profile.pk %}">Cancel</a>
+    <a href="{% url 'my_profile' %}">Cancel</a>
 </form>
 {% endblock %}

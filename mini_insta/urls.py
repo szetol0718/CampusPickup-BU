@@ -10,6 +10,7 @@ from .views import DeletePostView, UpdatePostView, ShowFollowersDetailView, Show
 from .views import MyProfileDetailView, CreateProfileView
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
+from . import views
 
 urlpatterns = [
     path("", ProfileListView.as_view(), name="show_all_profiles"),
@@ -42,4 +43,8 @@ urlpatterns = [
     path("logout_confirmation/",TemplateView.as_view(template_name="mini_insta/logged_out.html"),
         name="logout_confirmation"),
     path("create_profile", CreateProfileView.as_view(), name="create_profile"),
+    path("profile/<int:pk>/follow", views.follow_profile, name="follow_profile"),
+    path("profile/<int:pk>/delete_follow", views.delete_follow, name="delete_follow"),
+    path("post/<int:pk>/like", views.like_post, name="like_post"),
+    path("post/<int:pk>/delete_like", views.delete_like, name="delete_like"),
 ]

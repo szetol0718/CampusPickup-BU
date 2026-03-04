@@ -9,7 +9,7 @@ Description: Search form for mini_insta (Profiles and Posts).
 {% block content %}
 <h2>Search</h2>
 
-<form method="get" action="{% url 'search' profile.pk %}">
+<form method="get" action="{% url 'search'%}">
     <p>
         <label for="query">Search for Profiles or Posts:</label><br>
         <input type="text" name="query" id="query" placeholder="Type keywords...">

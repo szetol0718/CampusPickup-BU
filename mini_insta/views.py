@@ -5,15 +5,16 @@
 # displays all Profile records using the show_all_profiles.html template.
 
 from django.views.generic import ListView, DetailView
-from .models import Profile, Post, Photo
-import time
+from .models import Profile, Post, Photo, Follow, Like
+from django.utils import timezone
 from django.urls import reverse
 from django.views.generic import CreateView, UpdateView, DeleteView
 from .forms import CreatePostForm, UpdateProfileForm, CreateProfileForm
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 
 class MyLoginRequiredMixin(LoginRequiredMixin):
     """Require login and provide helper to get the logged-in user's Profile."""
@@ -37,6 +38,11 @@ class ProfileDetailView(DetailView):
     model = Profile
     template_name = "mini_insta/show_profile.html"
     context_object_name = "profile"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context["my_profile"] = Profile.objects.get(user=self.request.user)
+        return context
     
 # Author: Louis Szeto (szetol@bu.edu), 2/18/2026
 # Description: Views for mini_insta including list/detail views and create post.   
@@ -45,6 +51,20 @@ class PostDetailView(DetailView):
     model = Post
     template_name = "mini_insta/show_post.html"
     context_object_name = "post"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.object
+        if self.request.user.is_authenticated:
+            my_profile = Profile.objects.get(user=self.request.user)
+
+            context["my_profile"] = my_profile
+            context["i_liked"] = Like.objects.filter(
+                post=post,
+                profile=my_profile
+            ).exists()
+
+        return context
 
 class CreatePostView(MyLoginRequiredMixin,CreateView):
     """Create a Post for a specific Profile and also create one Photo."""
@@ -224,7 +244,6 @@ class CreateProfileView(CreateView):
         """Add the UserCreationForm to the context."""
         context = super().get_context_data(**kwargs)
 
-        # user form must keep prefix consistent on GET + POST
         if "user_form" not in context:
             context["user_form"] = UserCreationForm(prefix="user")
 
@@ -262,3 +281,63 @@ class CreateProfileView(CreateView):
     def get_success_url(self):
         """After creating a profile, go to the logged-in user's profile page."""
         return reverse("my_profile")
+    
+# Author: Louis Szeto (szetol@bu.edu), 3/4/2026
+# Description: action views to follow profile, delete follow, like post and delete like.
+@login_required
+def follow_profile(request, pk):
+    """Create a Follow: logged-in user follows Profile(pk)."""
+    me = get_object_or_404(Profile, user=request.user)
+    other = get_object_or_404(Profile, pk=pk)
+
+    # do not allow follow self
+    if me.pk == other.pk:
+        return redirect(reverse("profile_detail", kwargs={"pk": other.pk}))
+
+    # create only if not already following
+    Follow.objects.get_or_create(
+        profile=other,
+        follower_profile=me,
+    )
+
+    return redirect(reverse("profile_detail", kwargs={"pk": other.pk}))
+
+
+@login_required
+def delete_follow(request, pk):
+    """Delete a Follow: logged-in user unfollows Profile(pk)."""
+    me = get_object_or_404(Profile, user=request.user)
+    other = get_object_or_404(Profile, pk=pk)
+
+    Follow.objects.filter(profile=other, follower_profile=me).delete()
+
+    return redirect(reverse("profile_detail", kwargs={"pk": other.pk}))
+
+
+@login_required
+def like_post(request, pk):
+    """Create a Like: logged-in user likes Post(pk)."""
+    me = get_object_or_404(Profile, user=request.user)
+    post = get_object_or_404(Post, pk=pk)
+
+    # do not allow like own post
+    if post.profile.pk == me.pk:
+        return redirect(reverse("profile_detail", kwargs={"pk": post.pk}))
+
+    Like.objects.get_or_create(
+        post=post,
+        profile=me,
+    )
+
+    return redirect(reverse("show_post", kwargs={"pk": post.pk}))
+
+
+@login_required
+def delete_like(request, pk):
+    """Delete a Like: logged-in user unlikes Post(pk)."""
+    me = get_object_or_404(Profile, user=request.user)
+    post = get_object_or_404(Post, pk=pk)
+
+    Like.objects.filter(post=post, profile=me).delete()
+
+    return redirect(reverse("show_post", kwargs={"pk": post.pk}))
