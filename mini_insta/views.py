@@ -5,7 +5,7 @@
 # displays all Profile records using the show_all_profiles.html template.
 
 from django.views.generic import ListView, DetailView
-from .models import Profile, Post, Photo, Follow, Like
+from .models import Profile, Post, Photo, Follow, Like, Comment
 from django.utils import timezone
 from django.urls import reverse
 from django.views.generic import CreateView, UpdateView, DeleteView
@@ -339,5 +339,23 @@ def delete_like(request, pk):
     post = get_object_or_404(Post, pk=pk)
 
     Like.objects.filter(post=post, profile=me).delete()
+
+    return redirect(reverse("show_post", kwargs={"pk": post.pk}))
+
+@login_required
+def add_comment(request, pk):
+    """Create a Comment on Post(pk) by the logged-in user, then redirect."""
+    post = get_object_or_404(Post, pk=pk)
+    my_profile = get_object_or_404(Profile, user=request.user)
+
+    if request.method == "POST":
+        text = request.POST.get("comment_text", "").strip()
+
+        if text:
+            Comment.objects.create(
+                post=post,
+                profile=my_profile,
+                text=text,
+            )
 
     return redirect(reverse("show_post", kwargs={"pk": post.pk}))

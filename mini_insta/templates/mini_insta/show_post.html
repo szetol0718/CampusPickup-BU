@@ -48,6 +48,21 @@ Description: Displays a single Post with caption/timestamp and all photos.
 {% empty %}
     <p><em>No comments yet.</em></p>
 {% endfor %}
+{% if user.is_authenticated %}
+    {% if post.profile.user != user %}
+        <h4>Add a comment</h4>
+
+        <form method="post" action="{% url 'add_comment' post.pk %}">
+            {% csrf_token %}
+            <textarea name="comment_text" rows="3"
+                      placeholder="Write a comment..."></textarea>
+            <br>
+            <button type="submit">Post Comment</button>
+        </form>
+    {% endif %}
+{% else %}
+    <p><em>Log in to comment.</em></p>
+{% endif %}
 <p>
     <a href="{% url 'profile_detail' post.profile.pk %}">Back to profile</a>
 </p>

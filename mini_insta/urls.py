@@ -47,4 +47,5 @@ urlpatterns = [
     path("profile/<int:pk>/delete_follow", views.delete_follow, name="delete_follow"),
     path("post/<int:pk>/like", views.like_post, name="like_post"),
     path("post/<int:pk>/delete_like", views.delete_like, name="delete_like"),
+    path("post/<int:pk>/comment", views.add_comment, name="add_comment"),
 ]
