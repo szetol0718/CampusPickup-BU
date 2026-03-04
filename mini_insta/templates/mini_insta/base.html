@@ -44,6 +44,7 @@ CSS link, header/footer, and a content block for inheriting pages.
                 {% else %}
                     <a href="{% url 'login' %}">Login</a>
                     <span>Not logged in</span>
+                    <a href="{% url 'create_profile' %}">Create Profile</a>
                 {% endif %}
             </nav>
     </footer>

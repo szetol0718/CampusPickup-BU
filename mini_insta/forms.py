@@ -21,3 +21,12 @@ class UpdateProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ["display_name", "profile_image_url", "bio_text"]
+
+# Author: Louis Szeto (szetol@bu.edu), 3/3/2026
+# Description: New Forms for mini_insta create a Profile
+class CreateProfileForm(forms.ModelForm):
+    """Form to create a Profile (User is assigned programmatically)."""
+
+    class Meta:
+        model = Profile
+        fields = ["username", "display_name", "profile_image_url", "bio_text"]

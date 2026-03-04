@@ -9,9 +9,11 @@ from .models import Profile, Post, Photo
 import time
 from django.urls import reverse
 from django.views.generic import CreateView, UpdateView, DeleteView
-from .forms import CreatePostForm, UpdateProfileForm
+from .forms import CreatePostForm, UpdateProfileForm, CreateProfileForm
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 
 class MyLoginRequiredMixin(LoginRequiredMixin):
     """Require login and provide helper to get the logged-in user's Profile."""
@@ -197,6 +199,7 @@ class SearchView(MyLoginRequiredMixin, ListView):
 # Author: Louis Szeto (szetol@bu.edu), 3/3/2026
 # Description: Views for mini_insta to show my profile according to user and login.
 # Also modified other views related to adjustment of profile or posts requires user login.
+# Added a new view to handle and create new profile. 
 class MyProfileDetailView(MyLoginRequiredMixin, DetailView):
     """Show the logged-in user's profile."""
     model = Profile
@@ -205,3 +208,57 @@ class MyProfileDetailView(MyLoginRequiredMixin, DetailView):
 
     def get_object(self):
         return self.get_my_profile()
+    
+class CreateProfileView(CreateView):
+    """Create a Profile and a new Django User from one combined form."""
+    model = Profile
+    form_class = CreateProfileForm
+    template_name = "mini_insta/create_profile_form.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["prefix"] = "profile"
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        """Add the UserCreationForm to the context."""
+        context = super().get_context_data(**kwargs)
+
+        # user form must keep prefix consistent on GET + POST
+        if "user_form" not in context:
+            context["user_form"] = UserCreationForm(prefix="user")
+
+        return context
+
+    def form_valid(self, form):
+        """Create the User, log them in, attach it to the Profile, then save."""
+        user_form = UserCreationForm(self.request.POST, prefix="user")
+
+        if not user_form.is_valid():
+            # Re-render page with BOTH forms + errors
+            return self.render_to_response(
+                self.get_context_data(form=form, user_form=user_form)
+            )
+
+        # Create the new User (account username)
+        user = user_form.save()
+
+        # Log them in
+        login(self.request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+        # Attach user FK to the Profile form's instance (this is the prefixed form now)
+        form.instance.user = user
+
+        # Let CreateView save the Profile and redirect
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        """Ensure user_form errors show when profile form is invalid."""
+        user_form = UserCreationForm(self.request.POST, prefix="user")
+        return self.render_to_response(
+            self.get_context_data(form=form, user_form=user_form)
+        )
+
+    def get_success_url(self):
+        """After creating a profile, go to the logged-in user's profile page."""
+        return reverse("my_profile")

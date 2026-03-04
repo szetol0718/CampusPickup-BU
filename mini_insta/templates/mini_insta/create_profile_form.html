@@ -1,0 +1,35 @@
+<!--
+File: create_profile_form.html
+Author: Louis Szeto (szetol@bu.edu), 3/3/2026
+Description: Combined registration + profile creation form.
+-->
+
+{% extends "mini_insta/base.html" %}
+
+{% block content %}
+
+{% if user_form.errors %}
+    <p><strong>User form errors:</strong></p>
+    {{ user_form.errors }}
+{% endif %}
+
+{% if form.errors %}
+    <p><strong>Profile form errors:</strong></p>
+    {{ form.errors }}
+{% endif %}
+
+<h2>Create Account + Profile</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <h3>Account</h3>
+    {{ user_form.as_p }}
+
+    <h3>Profile </h3>
+    {{ form.as_p }}
+
+    <button type="submit">Create</button>
+    <a href="{% url 'show_all_profiles' %}">Cancel</a>
+</form>
+{% endblock %}
