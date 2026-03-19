@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'formdata' , #new app week2
     "restaurant", #assignment 2 app
     'blog', #new app week3
-    'mini_insta' #assignment 3 app
+    'mini_insta', #assignment 3 app
+    'marathon_analytics', #new app
 ]
 
 MIDDLEWARE = [

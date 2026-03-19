@@ -28,6 +28,7 @@ urlpatterns = [
     path('restaurant/',include ('restaurant.urls')),  #assignment 2 app
     path('blog/',include ('blog.urls')),  #week3 new app
     path('mini_insta/',include ('mini_insta.urls')),  #assignment 3 app
+    path('marathon_analytics/',include ('marathon_analytics.urls')),  #new app
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
