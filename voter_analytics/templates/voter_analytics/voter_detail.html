@@ -1,0 +1,39 @@
+<!--
+File: voter_analytics/templates/voter_analytics/voter_detail.html
+Author: Louis Szeto (szetol@bu.edu), 3/20/2026
+Description: Shows the complete profile and location of a single voter. 
+ -->
+{% extends 'voter_analytics/base.html' %}
+
+{% block content %}
+<h1>Voter Profile: {{ v.first_name }} {{ v.last_name }}</h1>
+
+<div>
+    <div>
+        <h3>Registration Details</h3>
+        <p><strong>Address:</strong> {{ v.street_number }} {{ v.street_name }}, {{ v.zip_code }}</p>
+        <p><strong>Apt:</strong> {{ v.apt_number|default:"None" }}</p>
+        <p><strong>DOB:</strong> {{ v.date_of_birth }}</p>
+        <p><strong>Registered:</strong> {{ v.date_of_registration }}</p>
+        <p><strong>Party:</strong> {{ v.party_affiliation }}</p>
+        <p><strong>Voter Score:</strong> {{ v.voter_score }}</p>
+    </div>
+
+    <div>
+        <h3>Voting History</h3>
+        <ul>
+            <li>v20state: {{ v.v20state|yesno:"Voted,No" }}</li>
+            <li>v21town: {{ v.v21town|yesno:"Voted,No" }}</li>
+            <li>v21primary: {{ v.v21primary|yesno:"Voted,No" }}</li>
+            <li>v22general: {{ v.v22general|yesno:"Voted,No" }}</li>
+            <li>v23town: {{ v.v23town|yesno:"Voted,No" }}</li>
+        </ul>
+        <a href="https://www.google.com/maps/search/?api=1&query={{ v.street_number }}+{{ v.street_name }}+Newton+MA" target="_blank">
+             View on Google Maps
+        </a>
+    </div>
+</div>
+
+<br>
+<a href="{% url 'voters' %}">← Back to Results</a>
+{% endblock %}

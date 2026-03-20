@@ -1,0 +1,24 @@
+<!-- 
+ File: voter_analytics/templates/voter_analytics/base.html
+Author: Louis Szeto (szetol@bu.edu), 3/20/2026
+Description: The base layout for the voter analytics application, including the navigation bar and shared CSS.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Newton Voter Analytics</title>
+</head>
+<body>
+
+<nav>
+    <a href="{% url 'voters' %}">Voter List</a>
+</nav>
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+</body>
+</html>

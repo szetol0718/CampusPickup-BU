@@ -1,0 +1,95 @@
+<!--
+File: voter_analytics/templates/voter_analytics/voter_list.html
+Author: Louis Szeto (szetol@bu.edu), 3/20/2026
+Description: Displays a paginated, filterable list of voter records. 
+ -->
+{% extends 'voter_analytics/base.html' %}
+
+{% block content %}
+<h1>Newton Voter Records</h1>
+
+<section class="filter-form">
+    <form method="GET">
+        <h3>Filter Voters</h3>
+        <label>Party:</label>
+        <select name="party">
+            <option value="">Any</option>
+            {% for p in parties %}
+                <option value="{{ p }}" {% if request.GET.party == p %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Min Year:</label>
+        <select name="min_dob">
+            <option value="">Any</option>
+            {% for y in years %}
+                <option value="{{ y }}" {% if request.GET.min_dob == y|stringformat:"i" %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Max Year:</label>
+        <select name="max_dob">
+            <option value="">Any</option>
+            {% for y in years %}
+                <option value="{{ y }}" {% if request.GET.max_dob == y|stringformat:"i" %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Score:</label>
+        <select name="voter_score">
+            <option value="">Any</option>
+            {% for s in scores %}
+                <option value="{{ s }}" {% if request.GET.voter_score == s|stringformat:"i" %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+
+        <div style="margin-top: 10px;">
+            <strong>Voted in:</strong>
+            <input type="checkbox" name="v20state" {% if request.GET.v20state %}checked{% endif %}> 2020 State
+            <input type="checkbox" name="v21town" {% if request.GET.v21town %}checked{% endif %}> 2021 Town
+            <input type="checkbox" name="v21primary" {% if request.GET.v21primary %}checked{% endif %}> 2021 Primary
+            <input type="checkbox" name="v22general" {% if request.GET.v22general %}checked{% endif %}> 2022 General
+            <input type="checkbox" name="v23town" {% if request.GET.v23town %}checked{% endif %}> 2023 Town
+        </div>
+
+        <button type="submit" style="margin-top:10px;">Apply Filters</button>
+    </form>
+</section>
+
+<table>
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Address</th>
+            <th>DOB</th>
+            <th>Party</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for v in voters %}
+        <tr>
+            <td><a href="{% url 'voter' v.pk %}">{{ v.first_name }}</a></td>
+            <td>{{ v.last_name }}</td>
+            <td>{{ v.street_number }} {{ v.street_name }} {% if v.apt_number %}Apt {{ v.apt_number }}{% endif %}</td>
+            <td>{{ v.date_of_birth }}</td>
+            <td>{{ v.party_affiliation }}</td>
+            <td>{{ v.voter_score }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    {% if is_paginated %}
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
