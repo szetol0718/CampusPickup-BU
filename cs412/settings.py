@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'blog', #new app week3
     'mini_insta', #assignment 3 app
     'marathon_analytics', #new app
+    'voter_analytics', #assignment 7 app
 ]
 
 MIDDLEWARE = [
