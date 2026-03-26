@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'mini_insta', #assignment 3 app
     'marathon_analytics', #new app
     'voter_analytics', #assignment 7 app
+    "rest_framework", ## NEW: Django REST framework
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,9 @@ CS_DEPLOYMENT_HOSTNAME = 'cs-webapps.bu.edu'
 if socket.gethostname() == CS_DEPLOYMENT_HOSTNAME:
     STATIC_URL = '/szetol/static/'
     MEDIA_URL = '/szetol/media/'
+
+
+REST_FRAMEWORK = {
+  'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+  'PAGE_SIZE': 10
+}
