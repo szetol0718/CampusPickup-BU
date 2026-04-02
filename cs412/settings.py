@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'marathon_analytics', #new app
     'voter_analytics', #assignment 7 app
     "rest_framework", ## NEW: Django REST framework
+    'dadjokes', # assignment 9 app
 ]
 
 MIDDLEWARE = [
