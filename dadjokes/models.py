@@ -5,7 +5,7 @@
 from django.db import models
 
 class Joke(models.Model):
-    """Stores the text of a joke and its contributor[cite: 32]."""
+    """Stores the text of a joke and its contributor."""
     text = models.TextField()
     contributor = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True) # Automatically set when created
@@ -14,7 +14,7 @@ class Joke(models.Model):
         return f'"{self.text}" - by {self.contributor}'
 
 class Picture(models.Model):
-    """Stores the URL of a silly image or GIF[cite: 33]."""
+    """Stores the URL of a silly image or GIF."""
     image_url = models.URLField() # Use URLField for image links 
     contributor = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
