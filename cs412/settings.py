@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'voter_analytics', #assignment 7 app
     "rest_framework", ## NEW: Django REST framework
     'dadjokes', # assignment 9 app
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [

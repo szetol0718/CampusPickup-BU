@@ -11,6 +11,7 @@ from .views import MyProfileDetailView, CreateProfileView
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 from . import views
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path("", ProfileListView.as_view(), name="show_all_profiles"),
@@ -58,4 +59,5 @@ urlpatterns = [
     path('api/posts', views.PostListCreateAPIView.as_view(), name='api_posts_create'),
     path('api/profile/<int:pk>/posts', views.ProfilePostsAPIView.as_view(), name='api_profile_posts'),
     path('api/profile/<int:pk>/feed', views.ProfileFeedAPIView.as_view(), name='api_profile_feed'),
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
 ]
