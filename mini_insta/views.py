@@ -18,6 +18,9 @@ from django.contrib.auth.decorators import login_required
 from rest_framework import generics, permissions
 from .serializers import ProfileSerializer, PostSerializer
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 
 class MyLoginRequiredMixin(LoginRequiredMixin):
     """Require login and provide helper to get the logged-in user's Profile."""
@@ -402,3 +405,24 @@ class ProfileFeedAPIView(generics.ListAPIView):
     def get_queryset(self):
             profile = self.request.user.profiles.first()
             return profile.get_post_feed()
+    
+class CustomAuthToken(ObtainAuthToken):
+    """
+    Custom authentication view that returns the token, 
+    plus the profile_id and username for the React Native app.
+    """
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        
+        # Safely get the profile ID if the user has a profile
+        profile = user.profiles.first() 
+        profile_id = profile.id if profile else None
+
+        return Response({
+            'token': token.key,
+            'profile_id': profile_id,
+            'username': user.username
+        })

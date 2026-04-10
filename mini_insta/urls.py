@@ -59,5 +59,5 @@ urlpatterns = [
     path('api/posts', views.PostListCreateAPIView.as_view(), name='api_posts_create'),
     path('api/profile/<int:pk>/posts', views.ProfilePostsAPIView.as_view(), name='api_profile_posts'),
     path('api/profile/<int:pk>/feed', views.ProfileFeedAPIView.as_view(), name='api_profile_feed'),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    path('api-token-auth/', views.CustomAuthToken.as_view(), name='api_token_auth'),
 ]
