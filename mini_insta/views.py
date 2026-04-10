@@ -377,6 +377,8 @@ class ProfileDetailAPIView(generics.RetrieveAPIView):
     """Reading a specific profile."""
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
 class PostListCreateAPIView(generics.ListCreateAPIView):
     """Reading all posts or Creating a new post."""
@@ -384,17 +386,20 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
-    def perform_create(self, serializer):
+
+def perform_create(self, serializer):
         profile = self.request.user.profiles.first() 
         serializer.save(profile=profile)
 
 class ProfilePostsAPIView(generics.ListAPIView):
     """Reading posts (and pictures) for one specific profile."""
     serializer_class = PostSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         profile_pk = self.kwargs['pk']
-        return Post.objects.filter(profile__pk=profile_pk)
+        return Post.objects.filter(profile__pk=profile_pk).order_by('-timestamp')
 
 class ProfileFeedAPIView(generics.ListAPIView):
     """Reading a feed for one profile (posts from followed users)."""
@@ -415,9 +420,8 @@ class CustomAuthToken(ObtainAuthToken):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        
-        # Safely get the profile ID if the user has a profile
+        token = Token.objects.get_or_create(user=user)
+
         profile = user.profiles.first() 
         profile_id = profile.id if profile else None
 
