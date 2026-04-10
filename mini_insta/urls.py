@@ -48,4 +48,14 @@ urlpatterns = [
     path("post/<int:pk>/like", views.like_post, name="like_post"),
     path("post/<int:pk>/delete_like", views.delete_like, name="delete_like"),
     path("post/<int:pk>/comment", views.add_comment, name="add_comment"),
+
+    #Author: Louis Szeto (szetol@bu,edu), 4/9/2026
+    # Added API endpoints for profiles and posts
+    # Profile API Endpoints
+    path('api/profiles', views.ProfileListAPIView.as_view(), name='api_profiles'),
+    path('api/profile/<int:pk>', views.ProfileDetailAPIView.as_view(), name='api_profile_detail'),
+    # Post and Feed API Endpoints
+    path('api/posts', views.PostListCreateAPIView.as_view(), name='api_posts_create'),
+    path('api/profile/<int:pk>/posts', views.ProfilePostsAPIView.as_view(), name='api_profile_posts'),
+    path('api/profile/<int:pk>/feed', views.ProfileFeedAPIView.as_view(), name='api_profile_feed'),
 ]

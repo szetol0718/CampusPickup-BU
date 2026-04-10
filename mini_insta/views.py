@@ -15,6 +15,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from rest_framework import generics
+from .serializers import ProfileSerializer, PostSerializer
 
 class MyLoginRequiredMixin(LoginRequiredMixin):
     """Require login and provide helper to get the logged-in user's Profile."""
@@ -359,3 +361,36 @@ def add_comment(request, pk):
             )
 
     return redirect(reverse("show_post", kwargs={"pk": post.pk}))
+
+class ProfileListAPIView(generics.ListAPIView):
+    """Reading a list of profiles."""
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+class ProfileDetailAPIView(generics.RetrieveAPIView):
+    """Reading a specific profile."""
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+class PostListCreateAPIView(generics.ListCreateAPIView):
+    """Reading all posts or Creating a new post."""
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class ProfilePostsAPIView(generics.ListAPIView):
+    """Reading posts (and pictures) for one specific profile."""
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        profile_pk = self.kwargs['pk']
+        return Post.objects.filter(profile__pk=profile_pk)
+
+class ProfileFeedAPIView(generics.ListAPIView):
+    """Reading a feed for one profile (posts from followed users)."""
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        profile = Profile.objects.get(pk=self.kwargs['pk'])
+        # Logic similar to your web version's feed
+        following = profile.get_following()
+        return Post.objects.filter(profile__in=following).order_by('-timestamp')
