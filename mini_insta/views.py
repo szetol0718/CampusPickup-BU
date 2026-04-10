@@ -15,8 +15,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from rest_framework import generics
+from rest_framework import generics, permissions
 from .serializers import ProfileSerializer, PostSerializer
+from rest_framework.authentication import TokenAuthentication
 
 class MyLoginRequiredMixin(LoginRequiredMixin):
     """Require login and provide helper to get the logged-in user's Profile."""
@@ -366,6 +367,8 @@ class ProfileListAPIView(generics.ListAPIView):
     """Reading a list of profiles."""
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
 class ProfileDetailAPIView(generics.RetrieveAPIView):
     """Reading a specific profile."""
@@ -376,6 +379,11 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
     """Reading all posts or Creating a new post."""
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    def perform_create(self, serializer):
+        profile = self.request.user.profiles.first() 
+        serializer.save(profile=profile)
 
 class ProfilePostsAPIView(generics.ListAPIView):
     """Reading posts (and pictures) for one specific profile."""
@@ -388,9 +396,9 @@ class ProfilePostsAPIView(generics.ListAPIView):
 class ProfileFeedAPIView(generics.ListAPIView):
     """Reading a feed for one profile (posts from followed users)."""
     serializer_class = PostSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        profile = Profile.objects.get(pk=self.kwargs['pk'])
-        # Logic similar to your web version's feed
-        following = profile.get_following()
-        return Post.objects.filter(profile__in=following).order_by('-timestamp')
+            profile = self.request.user.profiles.first()
+            return profile.get_post_feed()
