@@ -388,7 +388,7 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 def perform_create(self, serializer):
-        profile = self.request.user.profiles.first() 
+        profile = Profile.objects.filter(user=self.request.user).first()
         serializer.save(profile=profile)
 
 class ProfilePostsAPIView(generics.ListAPIView):
@@ -408,8 +408,10 @@ class ProfileFeedAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-            profile = self.request.user.profiles.first()
-            return profile.get_post_feed()
+            profile = Profile.objects.filter(user=self.request.user).first()
+            if profile:
+                return profile.get_post_feed()
+            return Post.objects.none()
     
 class CustomAuthToken(ObtainAuthToken):
     """
@@ -422,7 +424,7 @@ class CustomAuthToken(ObtainAuthToken):
         user = serializer.validated_data['user']
         token = Token.objects.get_or_create(user=user)
 
-        profile = user.profiles.first() 
+        profile = Profile.objects.filter(user=user).first()
         profile_id = profile.id if profile else None
 
         return Response({
