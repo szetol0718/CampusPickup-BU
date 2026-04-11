@@ -1,1 +1,1 @@
-https://cs-webapps.bu.edu/szetol/dadjokes/api/
+https://cs-webapps.bu.edu/szetol/mini_insta/api/profiles
