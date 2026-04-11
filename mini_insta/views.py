@@ -387,7 +387,7 @@ class PostListCreateAPIView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
-def perform_create(self, serializer):
+    def perform_create(self, serializer):
         profile = Profile.objects.filter(user=self.request.user).first()
         serializer.save(profile=profile)
 
