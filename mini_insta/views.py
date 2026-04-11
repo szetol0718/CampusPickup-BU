@@ -422,7 +422,7 @@ class CustomAuthToken(ObtainAuthToken):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        token = Token.objects.get_or_create(user=user)
+        token , created = Token.objects.get_or_create(user=user)
 
         profile = Profile.objects.filter(user=user).first()
         profile_id = profile.id if profile else None
