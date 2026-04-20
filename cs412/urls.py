@@ -31,6 +31,7 @@ urlpatterns = [
     path('marathon_analytics/',include ('marathon_analytics.urls')),  #new app
     path('voter_analytics/',include ('voter_analytics.urls')),  #assignment 7 app
     path('dadjokes/',include ('dadjokes.urls')),  #assignment 9 app
+    path('campus_pickup/',include ('campus_pickup.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
