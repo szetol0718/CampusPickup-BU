@@ -8,6 +8,9 @@ Description: List view template for RideMessage records.
 {% block content %}
 <section class="panel">
     <h2>Ride Messages</h2>
+    <p>
+        <a class="button-link" href="{% url 'campus_pickup:message_create' %}">Create New Message</a>
+    </p>
     <table>
         <thead>
             <tr>

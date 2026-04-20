@@ -1,0 +1,21 @@
+<!--
+File: campus_pickup/templates/campus_pickup/profile_form.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: Form template for creating a profile.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    {% if object %}
+    <h2>Edit Profile #{{ object.id }}</h2>
+    {% else %}
+    <h2>Create New Profile</h2>
+    {% endif %}
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Profile</button>
+    </form>
+</section>
+{% endblock %}

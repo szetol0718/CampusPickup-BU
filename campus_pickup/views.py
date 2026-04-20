@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from .forms import RideForm, RideMessageForm
 from .models import Profile, Ride, RideMessage, RideParticipant
 
 
@@ -39,6 +40,35 @@ class ProfileDetailView(DetailView):
     model = Profile
     template_name = "campus_pickup/profile_detail.html"
     context_object_name = "profile"
+
+
+class ProfileCreateView(CreateView):
+    """Create a new profile record."""
+
+    model = Profile
+    template_name = "campus_pickup/profile_form.html"
+    fields = ["user", "display_name", "bio_text", "profile_image_url"]
+    success_url = reverse_lazy("campus_pickup:profile_list")
+
+
+class ProfileUpdateView(UpdateView):
+    """Update an existing profile record."""
+
+    model = Profile
+    template_name = "campus_pickup/profile_form.html"
+    fields = ["user", "display_name", "bio_text", "profile_image_url"]
+
+    def get_success_url(self):
+        """Return the profile detail page after a successful update."""
+        return reverse("campus_pickup:profile_detail", kwargs={"pk": self.object.pk})
+
+
+class ProfileDeleteView(DeleteView):
+    """Delete an existing profile record."""
+
+    model = Profile
+    template_name = "campus_pickup/profile_confirm_delete.html"
+    success_url = reverse_lazy("campus_pickup:profile_list")
 
 
 class RideListView(ListView):
@@ -102,16 +132,7 @@ class RideCreateView(CreateView):
 
     model = Ride
     template_name = "campus_pickup/ride_form.html"
-    fields = [
-        "creator",
-        "driver",
-        "pickup_location",
-        "destination",
-        "pickup_time",
-        "request_type",
-        "status",
-        "seat_capacity",
-    ]
+    form_class = RideForm
     success_url = reverse_lazy("campus_pickup:ride_list")
 
 
@@ -120,16 +141,7 @@ class RideUpdateView(UpdateView):
 
     model = Ride
     template_name = "campus_pickup/ride_form.html"
-    fields = [
-        "creator",
-        "driver",
-        "pickup_location",
-        "destination",
-        "pickup_time",
-        "request_type",
-        "status",
-        "seat_capacity",
-    ]
+    form_class = RideForm
 
     def get_success_url(self):
         """Return the detail page after a successful update."""
@@ -200,3 +212,46 @@ class RideMessageDetailView(DetailView):
     model = RideMessage
     template_name = "campus_pickup/message_detail.html"
     context_object_name = "message"
+
+
+class RideMessageCreateView(CreateView):
+    """Create a new ride-message record."""
+
+    model = RideMessage
+    template_name = "campus_pickup/message_form.html"
+    form_class = RideMessageForm
+
+    def get_initial(self):
+        """Optionally prefill the ride field from a query parameter."""
+        initial = super().get_initial()
+        ride_id = self.request.GET.get("ride")
+        if ride_id:
+            initial["ride"] = ride_id
+        return initial
+
+    def get_success_url(self):
+        """Return the related ride detail page after creating a message."""
+        return reverse("campus_pickup:ride_detail", kwargs={"pk": self.object.ride.pk})
+
+
+class RideMessageUpdateView(UpdateView):
+    """Update an existing ride-message record."""
+
+    model = RideMessage
+    template_name = "campus_pickup/message_form.html"
+    form_class = RideMessageForm
+
+    def get_success_url(self):
+        """Return the message detail page after a successful update."""
+        return reverse("campus_pickup:message_detail", kwargs={"pk": self.object.pk})
+
+
+class RideMessageDeleteView(DeleteView):
+    """Delete an existing ride-message record."""
+
+    model = RideMessage
+    template_name = "campus_pickup/message_confirm_delete.html"
+
+    def get_success_url(self):
+        """Return the related ride detail page after deleting a message."""
+        return reverse("campus_pickup:ride_detail", kwargs={"pk": self.object.ride.pk})

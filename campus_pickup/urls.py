@@ -10,7 +10,10 @@ app_name = "campus_pickup"
 urlpatterns = [
     path("", views.home, name="home"),
     path("profiles/", views.ProfileListView.as_view(), name="profile_list"),
+    path("profiles/create/", views.ProfileCreateView.as_view(), name="profile_create"),
     path("profiles/<int:pk>/", views.ProfileDetailView.as_view(), name="profile_detail"),
+    path("profiles/<int:pk>/update/", views.ProfileUpdateView.as_view(), name="profile_update"),
+    path("profiles/<int:pk>/delete/", views.ProfileDeleteView.as_view(), name="profile_delete"),
     path("rides/", views.RideListView.as_view(), name="ride_list"),
     path("rides/create/", views.RideCreateView.as_view(), name="ride_create"),
     path("rides/<int:pk>/", views.RideDetailView.as_view(), name="ride_detail"),
@@ -24,5 +27,8 @@ urlpatterns = [
         name="participant_detail",
     ),
     path("messages/", views.RideMessageListView.as_view(), name="message_list"),
+    path("messages/create/", views.RideMessageCreateView.as_view(), name="message_create"),
     path("messages/<int:pk>/", views.RideMessageDetailView.as_view(), name="message_detail"),
+    path("messages/<int:pk>/update/", views.RideMessageUpdateView.as_view(), name="message_update"),
+    path("messages/<int:pk>/delete/", views.RideMessageDeleteView.as_view(), name="message_delete"),
 ]
