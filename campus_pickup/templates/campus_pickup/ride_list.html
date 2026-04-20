@@ -1,0 +1,60 @@
+<!--
+File: campus_pickup/templates/campus_pickup/ride_list.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: List view template for Ride records with basic filtering.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Rides</h2>
+
+    <form method="get" class="filters">
+        <label for="q">Search destination/location:</label>
+        <input id="q" name="q" type="text" value="{{ current_query }}">
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="">All</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>
+                {{ label }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Creator</th>
+                <th>Pickup</th>
+                <th>Destination</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Seats Left</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in rides %}
+            <tr>
+                <td><a href="{% url 'campus_pickup:ride_detail' r.pk %}">{{ r.id }}</a></td>
+                <td>{{ r.creator.display_name }}</td>
+                <td>{{ r.pickup_location }}</td>
+                <td>{{ r.destination }}</td>
+                <td>{{ r.pickup_time }}</td>
+                <td>{{ r.get_status_display }}</td>
+                <td>{{ r.seats_remaining }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No rides found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -1,0 +1,53 @@
+<!--
+File: campus_pickup/templates/campus_pickup/ride_detail.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: Detail view template for a Ride record and related data.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Ride #{{ ride.id }}</h2>
+    <p><strong>Creator:</strong> {{ ride.creator.display_name }}</p>
+    <p><strong>Driver:</strong> {% if ride.driver %}{{ ride.driver.display_name }}{% else %}(none){% endif %}</p>
+    <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
+    <p><strong>Destination:</strong> {{ ride.destination }}</p>
+    <p><strong>Pickup Time:</strong> {{ ride.pickup_time }}</p>
+    <p><strong>Request Type:</strong> {{ ride.get_request_type_display }}</p>
+    <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
+    <p><strong>Seat Capacity:</strong> {{ ride.seat_capacity }}</p>
+    <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }}</p>
+</section>
+
+<section class="panel">
+    <h3>Participants</h3>
+    <ul>
+        {% for p in participants %}
+        <li>
+            <a href="{% url 'campus_pickup:participant_detail' p.pk %}">
+                {{ p.passenger.display_name }}
+            </a>
+            (joined {{ p.joined_at }})
+        </li>
+        {% empty %}
+        <li>No participants.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section class="panel">
+    <h3>Messages</h3>
+    <ul>
+        {% for m in messages %}
+        <li>
+            <a href="{% url 'campus_pickup:message_detail' m.pk %}">
+                {{ m.sender.display_name }}
+            </a>
+            : {{ m.text }} ({{ m.timestamp }})
+        </li>
+        {% empty %}
+        <li>No messages.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

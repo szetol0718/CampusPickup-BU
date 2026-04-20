@@ -1,0 +1,38 @@
+<!--
+File: campus_pickup/templates/campus_pickup/message_list.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: List view template for RideMessage records.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Ride Messages</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ride</th>
+                <th>Sender</th>
+                <th>Text</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in messages %}
+            <tr>
+                <td><a href="{% url 'campus_pickup:message_detail' m.pk %}">{{ m.id }}</a></td>
+                <td><a href="{% url 'campus_pickup:ride_detail' m.ride.pk %}">Ride #{{ m.ride.pk }}</a></td>
+                <td>{{ m.sender.display_name }}</td>
+                <td>{{ m.text }}</td>
+                <td>{{ m.timestamp }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No messages found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -1,0 +1,124 @@
+/*
+File: static/styles/campus_pickup.css
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: Styling for campus pickup templates.
+*/
+
+:root {
+    --bg: #f3f7f8;
+    --surface: #ffffff;
+    --border: #cfdbe0;
+    --text: #1d2a32;
+    --accent: #0e7c86;
+    --accent-dark: #0a5960;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(180deg, #f9fcfd 0%, var(--bg) 100%);
+    color: var(--text);
+    font-family: "Trebuchet MS", "Segoe UI", Tahoma, sans-serif;
+}
+
+header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem;
+}
+
+header h1 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.6rem;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: #ffffff;
+    background: var(--accent);
+    border-radius: 6px;
+    padding: 0.45rem 0.8rem;
+}
+
+nav a:hover {
+    background: var(--accent-dark);
+}
+
+main {
+    max-width: 1100px;
+    margin: 1rem auto;
+    padding: 0 1rem;
+}
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.count-list {
+    padding-left: 1.2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid var(--border);
+    padding: 0.55rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background: #edf4f6;
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.filters input,
+.filters select,
+.filters button {
+    font: inherit;
+    padding: 0.35rem 0.5rem;
+}
+
+.filters button {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+@media (max-width: 760px) {
+    nav {
+        flex-direction: column;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}

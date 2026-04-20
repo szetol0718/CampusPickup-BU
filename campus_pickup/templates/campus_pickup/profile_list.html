@@ -1,0 +1,36 @@
+<!--
+File: campus_pickup/templates/campus_pickup/profile_list.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: List view template for Profile records.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Profiles</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Display Name</th>
+                <th>User</th>
+                <th>Join Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in profiles %}
+            <tr>
+                <td>{{ p.id }}</td>
+                <td><a href="{% url 'campus_pickup:profile_detail' p.pk %}">{{ p.display_name }}</a></td>
+                <td>{{ p.user.username }}</td>
+                <td>{{ p.join_date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No profiles found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

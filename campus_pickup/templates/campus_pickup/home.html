@@ -1,0 +1,19 @@
+<!--
+File: campus_pickup/templates/campus_pickup/home.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: Home page for quick navigation and model record counts.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Week 2 Interface</h2>
+    <p>Use the navigation links to view list and detail pages for each model.</p>
+    <ul class="count-list">
+        <li>Profiles: {{ profile_count }}</li>
+        <li>Rides: {{ ride_count }}</li>
+        <li>Ride Participants: {{ participant_count }}</li>
+        <li>Ride Messages: {{ message_count }}</li>
+    </ul>
+</section>
+{% endblock %}

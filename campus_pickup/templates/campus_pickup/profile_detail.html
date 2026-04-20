@@ -1,0 +1,17 @@
+<!--
+File: campus_pickup/templates/campus_pickup/profile_detail.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: Detail view template for a Profile record.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Profile #{{ profile.id }}</h2>
+    <p><strong>Display Name:</strong> {{ profile.display_name }}</p>
+    <p><strong>Username:</strong> {{ profile.user.username }}</p>
+    <p><strong>Bio:</strong> {{ profile.bio_text|default:"(none)" }}</p>
+    <p><strong>Profile Image URL:</strong> {{ profile.profile_image_url|default:"(none)" }}</p>
+    <p><strong>Join Date:</strong> {{ profile.join_date }}</p>
+</section>
+{% endblock %}

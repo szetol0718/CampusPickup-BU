@@ -1,0 +1,36 @@
+<!--
+File: campus_pickup/templates/campus_pickup/participant_list.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: List view template for RideParticipant records.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Ride Participants</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ride</th>
+                <th>Passenger</th>
+                <th>Joined At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in participants %}
+            <tr>
+                <td><a href="{% url 'campus_pickup:participant_detail' p.pk %}">{{ p.id }}</a></td>
+                <td><a href="{% url 'campus_pickup:ride_detail' p.ride.pk %}">Ride #{{ p.ride.pk }}</a></td>
+                <td>{{ p.passenger.display_name }}</td>
+                <td>{{ p.joined_at }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No ride participants found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
