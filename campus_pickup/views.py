@@ -3,8 +3,9 @@
 # Description: List and detail interfaces for campus pickup models.
 
 from django.db.models import Q
-from django.shortcuts import render
-from django.views.generic import DetailView, ListView
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .models import Profile, Ride, RideMessage, RideParticipant
 
@@ -87,7 +88,78 @@ class RideDetailView(DetailView):
         context["messages"] = RideMessage.objects.filter(ride=self.object).select_related(
             "sender"
         ).order_by("-timestamp")
+        participant_ids = RideParticipant.objects.filter(ride=self.object).values_list(
+            "passenger_id", flat=True
+        )
+        context["joinable_profiles"] = Profile.objects.exclude(id__in=participant_ids).order_by(
+            "display_name"
+        )
         return context
+
+
+class RideCreateView(CreateView):
+    """Create a new ride record."""
+
+    model = Ride
+    template_name = "campus_pickup/ride_form.html"
+    fields = [
+        "creator",
+        "driver",
+        "pickup_location",
+        "destination",
+        "pickup_time",
+        "request_type",
+        "status",
+        "seat_capacity",
+    ]
+    success_url = reverse_lazy("campus_pickup:ride_list")
+
+
+class RideUpdateView(UpdateView):
+    """Update an existing ride record."""
+
+    model = Ride
+    template_name = "campus_pickup/ride_form.html"
+    fields = [
+        "creator",
+        "driver",
+        "pickup_location",
+        "destination",
+        "pickup_time",
+        "request_type",
+        "status",
+        "seat_capacity",
+    ]
+
+    def get_success_url(self):
+        """Return the detail page after a successful update."""
+        return reverse("campus_pickup:ride_detail", kwargs={"pk": self.object.pk})
+
+
+class RideDeleteView(DeleteView):
+    """Delete an existing ride record."""
+
+    model = Ride
+    template_name = "campus_pickup/ride_confirm_delete.html"
+    success_url = reverse_lazy("campus_pickup:ride_list")
+
+
+def join_ride(request, pk):
+    """Handle ride join requests submitted from the ride detail view."""
+    ride = get_object_or_404(Ride, pk=pk)
+    if request.method != "POST":
+        return redirect("campus_pickup:ride_detail", pk=ride.pk)
+
+    profile_id = request.POST.get("profile_id")
+    passenger = get_object_or_404(Profile, pk=profile_id)
+
+    if not ride.is_full():
+        RideParticipant.objects.get_or_create(ride=ride, passenger=passenger)
+        if ride.is_full():
+            ride.status = "full"
+            ride.save()
+
+    return redirect("campus_pickup:ride_detail", pk=ride.pk)
 
 
 class RideParticipantListView(ListView):

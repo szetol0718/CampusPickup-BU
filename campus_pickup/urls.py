@@ -12,7 +12,11 @@ urlpatterns = [
     path("profiles/", views.ProfileListView.as_view(), name="profile_list"),
     path("profiles/<int:pk>/", views.ProfileDetailView.as_view(), name="profile_detail"),
     path("rides/", views.RideListView.as_view(), name="ride_list"),
+    path("rides/create/", views.RideCreateView.as_view(), name="ride_create"),
     path("rides/<int:pk>/", views.RideDetailView.as_view(), name="ride_detail"),
+    path("rides/<int:pk>/update/", views.RideUpdateView.as_view(), name="ride_update"),
+    path("rides/<int:pk>/delete/", views.RideDeleteView.as_view(), name="ride_delete"),
+    path("rides/<int:pk>/join/", views.join_ride, name="join_ride"),
     path("participants/", views.RideParticipantListView.as_view(), name="participant_list"),
     path(
         "participants/<int:pk>/",

@@ -8,6 +8,10 @@ Description: Detail view template for a Ride record and related data.
 {% block content %}
 <section class="panel">
     <h2>Ride #{{ ride.id }}</h2>
+    <p>
+        <a class="button-link" href="{% url 'campus_pickup:ride_update' ride.pk %}">Edit Ride</a>
+        <a class="button-link danger-link" href="{% url 'campus_pickup:ride_delete' ride.pk %}">Delete Ride</a>
+    </p>
     <p><strong>Creator:</strong> {{ ride.creator.display_name }}</p>
     <p><strong>Driver:</strong> {% if ride.driver %}{{ ride.driver.display_name }}{% else %}(none){% endif %}</p>
     <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
@@ -17,6 +21,24 @@ Description: Detail view template for a Ride record and related data.
     <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
     <p><strong>Seat Capacity:</strong> {{ ride.seat_capacity }}</p>
     <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }}</p>
+
+    <h3>Join This Ride</h3>
+    {% if ride.seats_remaining > 0 and joinable_profiles %}
+    <form method="post" action="{% url 'campus_pickup:join_ride' ride.pk %}" class="filters">
+        {% csrf_token %}
+        <label for="profile_id">Passenger:</label>
+        <select name="profile_id" id="profile_id" required>
+            {% for p in joinable_profiles %}
+            <option value="{{ p.pk }}">{{ p.display_name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Join Ride</button>
+    </form>
+    {% elif ride.seats_remaining > 0 %}
+    <p>No additional profiles are available to join this ride.</p>
+    {% else %}
+    <p>This ride is full. No more passengers can join.</p>
+    {% endif %}
 </section>
 
 <section class="panel">

@@ -1,0 +1,22 @@
+<!--
+File: campus_pickup/templates/campus_pickup/ride_form.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: Form template for creating and updating a ride.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    {% if object %}
+    <h2>Edit Ride #{{ object.id }}</h2>
+    {% else %}
+    <h2>Create New Ride</h2>
+    {% endif %}
+
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Ride</button>
+    </form>
+</section>
+{% endblock %}

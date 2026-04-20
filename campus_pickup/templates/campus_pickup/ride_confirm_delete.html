@@ -1,0 +1,19 @@
+<!--
+File: campus_pickup/templates/campus_pickup/ride_confirm_delete.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: Confirmation template for deleting a ride.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Delete Ride #{{ object.id }}</h2>
+    <p>Are you sure you want to delete this ride from {{ object.pickup_location }} to {{ object.destination }}?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button class="danger-link" type="submit">Yes, Delete</button>
+        <a class="button-link" href="{% url 'campus_pickup:ride_detail' object.pk %}">Cancel</a>
+    </form>
+</section>
+{% endblock %}
