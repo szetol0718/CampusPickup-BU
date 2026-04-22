@@ -200,7 +200,9 @@ class RideListView(ProfileRequiredMixin, ListView):
 
     def get_queryset(self):
         """Filter rides by optional destination/location text and status."""
-        queryset = Ride.objects.select_related("creator", "driver").order_by("pickup_time")
+        queryset = Ride.objects.select_related("creator", "driver").exclude(
+            status="completed"
+        ).order_by("pickup_time")
         query = self.request.GET.get("q", "").strip()
         status = self.request.GET.get("status", "").strip()
 
@@ -274,6 +276,12 @@ class RideDetailView(ProfileRequiredMixin, DetailView):
         context["can_quit"] = (
             my_profile is not None
             and (already_joined or self.object.driver == my_profile)
+            and self.object.status != "completed"
+        )
+        context["can_complete"] = (
+            my_profile is not None
+            and self.object.driver == my_profile
+            and self.object.status != "completed"
         )
         context["can_view_messages"] = (
             already_joined
@@ -399,6 +407,12 @@ def join_ride(request, pk):
     join_role = request.POST.get("join_role")
 
     if join_role == "driver" and ride.driver is None and passenger != ride.creator:
+        seat_capacity = request.POST.get("seat_capacity")
+        if seat_capacity:
+            try:
+                ride.seat_capacity = max(int(seat_capacity), ride.seats_taken() + 1)
+            except ValueError:
+                pass
         ride.driver = passenger
         update_ride_status(ride)
     elif (
@@ -430,6 +444,24 @@ def quit_ride(request, pk):
 
     RideParticipant.objects.filter(ride=ride, passenger=profile).delete()
     update_ride_status(ride)
+
+    return redirect("campus_pickup:ride_detail", pk=ride.pk)
+
+
+@login_required(login_url=reverse_lazy("campus_pickup:login"))
+def complete_ride(request, pk):
+    """Allow the driver to mark a ride as completed."""
+    ride = get_object_or_404(Ride, pk=pk)
+    if request.method != "POST":
+        return redirect("campus_pickup:ride_detail", pk=ride.pk)
+
+    profile = Profile.objects.filter(user=request.user).first()
+    if not profile:
+        return redirect("campus_pickup:profile_create")
+
+    if ride.driver == profile:
+        ride.status = "completed"
+        ride.save()
 
     return redirect("campus_pickup:ride_detail", pk=ride.pk)
 
@@ -485,28 +517,35 @@ class RideMessageCreateView(ProfileRequiredMixin, CreateView):
     template_name = "campus_pickup/message_form.html"
     form_class = RideMessageForm
 
-    def get_initial(self):
-        """Optionally prefill the ride field from a query parameter."""
-        initial = super().get_initial()
-        ride_id = self.request.GET.get("ride")
-        if ride_id:
-            initial["ride"] = ride_id
-        return initial
+    def dispatch(self, request, *args, **kwargs):
+        """Require a ride from the URL or query string before creating a message."""
+        self.ride = self.get_ride()
+        if not self.ride:
+            return redirect("campus_pickup:my_rides")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_ride(self):
+        """Return the related ride if the user is allowed to message it."""
+        ride_id = self.kwargs.get("pk") or self.request.GET.get("ride")
+        if not ride_id:
+            return None
+        return self.get_my_ride_queryset().filter(pk=ride_id).first()
+
+    def get_context_data(self, **kwargs):
+        """Add the related ride to the message form page."""
+        context = super().get_context_data(**kwargs)
+        context["ride"] = self.ride
+        return context
 
     def get_success_url(self):
         """Return the related ride detail page after creating a message."""
         return reverse("campus_pickup:ride_detail", kwargs={"pk": self.object.ride.pk})
 
     def form_valid(self, form):
-        """Assign the logged-in user's Profile as the message sender."""
+        """Assign the ride and logged-in user's Profile automatically."""
+        form.instance.ride = self.ride
         form.instance.sender = self.get_my_profile()
         return super().form_valid(form)
-
-    def get_form(self, form_class=None):
-        """Limit message creation to rides related to the logged-in user."""
-        form = super().get_form(form_class)
-        form.fields["ride"].queryset = self.get_my_ride_queryset().order_by("pickup_time")
-        return form
 
 
 class RideMessageUpdateView(ProfileRequiredMixin, UpdateView):

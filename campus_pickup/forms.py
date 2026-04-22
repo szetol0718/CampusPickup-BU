@@ -77,6 +77,9 @@ class RideForm(forms.ModelForm):
         elif request_type == "realtime":
             cleaned_data["pickup_time"] = None
 
+        if cleaned_data.get("ride_role") == "requester":
+            cleaned_data["seat_capacity"] = 4
+
         return cleaned_data
 
 
@@ -87,7 +90,7 @@ class RideMessageForm(forms.ModelForm):
         """Metadata for RideMessageForm fields."""
 
         model = RideMessage
-        fields = ["ride", "text"]
+        fields = ["text"]
         widgets = {
             "text": forms.Textarea(attrs={"rows": 4}),
         }

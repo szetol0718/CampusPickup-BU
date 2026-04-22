@@ -10,12 +10,23 @@ Description: Form template for creating and updating a ride message.
     {% if object %}
     <h2>Edit Ride Message #{{ object.id }}</h2>
     {% else %}
-    <h2>Create New Ride Message</h2>
+    <h2>Add Message</h2>
+    {% if ride %}
+    <p>
+        <strong>Ride:</strong>
+        {{ ride.pickup_location }} to {{ ride.destination }}
+    </p>
+    {% endif %}
     {% endif %}
 
     <form method="post" class="form-grid">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form.non_field_errors }}
+        <p>
+            {{ form.text.label_tag }}
+            {{ form.text }}
+            {{ form.text.errors }}
+        </p>
         <button type="submit">Save Message</button>
     </form>
 </section>

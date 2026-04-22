@@ -47,6 +47,9 @@ Description: Form template for creating and updating a ride.
         <p>
             {{ form.seat_capacity.label_tag }}
             {{ form.seat_capacity }}
+            <span class="help-text">
+                If you need a ride, this is automatically set to 4. A driver can change it when joining.
+            </span>
             {{ form.seat_capacity.errors }}
         </p>
         <button type="submit">Create Ride</button>

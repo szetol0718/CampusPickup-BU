@@ -8,7 +8,7 @@ Description: Detail view template for a Ride record and related data.
 {% block content %}
 <section class="panel">
     <div class="page-title">
-        <h2>Ride #{{ ride.id }}</h2>
+        <h2>{{ ride.pickup_location }} to {{ ride.destination }}</h2>
         {% if my_profile.profile_image_url %}
         <img
             class="profile-avatar title-avatar"
@@ -39,6 +39,13 @@ Description: Detail view template for a Ride record and related data.
     <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
     <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }} / {{ ride.seat_capacity }}  </p>
 
+    {% if can_complete %}
+    <form method="post" action="{% url 'campus_pickup:complete_ride' ride.pk %}" class="filters">
+        {% csrf_token %}
+        <button type="submit">Mark Completed</button>
+    </form>
+    {% endif %}
+
     <h3>Join This Ride</h3>
     {% if can_quit %}
     <form method="post" action="{% url 'campus_pickup:quit_ride' ride.pk %}" class="filters">
@@ -51,6 +58,14 @@ Description: Detail view template for a Ride record and related data.
     <form method="post" action="{% url 'campus_pickup:join_ride' ride.pk %}" class="filters">
         {% csrf_token %}
         {% if can_join_as_driver %}
+        <label for="driver_seat_capacity">Total seats:</label>
+        <input
+            id="driver_seat_capacity"
+            name="seat_capacity"
+            type="number"
+            min="{{ ride.seats_taken }}"
+            value="{{ ride.seat_capacity }}"
+        >
         <button type="submit" name="join_role" value="driver">
             Join as Driver
         </button>
@@ -108,7 +123,7 @@ Description: Detail view template for a Ride record and related data.
     <h3>Messages</h3>
     {% if can_view_messages %}
     <p>
-        <a class="button-link" href="{% url 'campus_pickup:message_create' %}?ride={{ ride.pk }}">
+        <a class="button-link" href="{% url 'campus_pickup:ride_message_create' ride.pk %}">
             Add Message
         </a>
     </p>
