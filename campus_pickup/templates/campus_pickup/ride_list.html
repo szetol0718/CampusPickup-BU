@@ -48,29 +48,30 @@ Description: List view template for Ride records with basic filtering.
                 <th>Status</th>
                 <th>Seats Left</th>
                 <th>My Role</th>
+                <th>Details</th>
             </tr>
         </thead>
         <tbody>
             {% for r in rides %}
-            <tr
-                class="clickable-row"
-                data-href="{% url 'campus_pickup:ride_detail' r.pk %}"
-                tabindex="0"
-                onclick="window.location.href=this.dataset.href"
-                onkeydown="if (event.key === 'Enter') window.location.href=this.dataset.href"
-            >
+            <tr>
                 <td>{{ r.pickup_location }}</td>
                 <td>{{ r.destination }}</td>
                 <td>{% if r.pickup_time %}{{ r.pickup_time }}{% else %}Real-time{% endif %}</td>
-                <td>{{ r.get_status_display }}</td>
+                <td>
+                    {{ r.get_status_display }}
+                    {% if not r.driver %}
+                    <span class="need-driver">Needs driver</span>
+                    {% endif %}
+                </td>
                 <td>{{ r.seats_remaining }}</td>
                 <td>
-                    {% if r.creator == my_profile %}Creator{% elif r.driver == my_profile %}Driver{% else %}-{% endif %}
+                    {% if r.driver == my_profile %}Driver{% elif r.id in my_passenger_ride_ids %}Passenger{% else %}-{% endif %}
                 </td>
+                <td><a href="{% url 'campus_pickup:ride_detail' r.pk %}">View</a></td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6">No rides found.</td>
+                <td colspan="7">No rides found.</td>
             </tr>
             {% endfor %}
         </tbody>

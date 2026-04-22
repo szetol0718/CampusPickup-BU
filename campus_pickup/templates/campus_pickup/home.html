@@ -45,7 +45,7 @@ Description: Logged-in dashboard for campus pickup users.
                 <td>{% if r.pickup_time %}{{ r.pickup_time }}{% else %}Real-time{% endif %}</td>
                 <td>{{ r.get_status_display }}</td>
                 <td>
-                    {% if r.creator == profile %}Creator{% elif r.driver == profile %}Driver{% else %}Passenger{% endif %}
+                    {% if r.driver == profile %}Driver{% elif r.id in my_passenger_ride_ids %}Passenger{% else %}-{% endif %}
                 </td>
             </tr>
             {% empty %}

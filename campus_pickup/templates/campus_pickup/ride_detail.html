@@ -24,8 +24,14 @@ Description: Detail view template for a Ride record and related data.
         <a class="button-link danger-link" href="{% url 'campus_pickup:ride_delete' ride.pk %}">Delete Ride</a>
     </p>
     {% endif %}
-    <p><strong>Creator:</strong> {{ ride.creator.display_name }}</p>
-    <p><strong>Driver:</strong> {% if ride.driver %}{{ ride.driver.display_name }}{% else %}(none){% endif %}</p>
+    <p>
+        <strong>Driver:</strong>
+        {% if ride.driver %}
+        {{ ride.driver.display_name }}
+        {% else %}
+        <span class="need-driver">Needs driver</span>
+        {% endif %}
+    </p>
     <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
     <p><strong>Destination:</strong> {{ ride.destination }}</p>
     <p><strong>Pickup Time:</strong> {% if ride.pickup_time %}{{ ride.pickup_time }}{% else %}Real-time{% endif %}</p>
@@ -34,10 +40,26 @@ Description: Detail view template for a Ride record and related data.
     <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }} / {{ ride.seat_capacity }}  </p>
 
     <h3>Join This Ride</h3>
+    {% if can_quit %}
+    <form method="post" action="{% url 'campus_pickup:quit_ride' ride.pk %}" class="filters">
+        {% csrf_token %}
+        <button type="submit">Quit Ride</button>
+    </form>
+    {% endif %}
+
     {% if can_join %}
     <form method="post" action="{% url 'campus_pickup:join_ride' ride.pk %}" class="filters">
         {% csrf_token %}
-        <button type="submit">Join Ride as {{ my_profile.display_name }}</button>
+        {% if can_join_as_driver %}
+        <button type="submit" name="join_role" value="driver">
+            Join as Driver
+        </button>
+        {% endif %}
+        {% if can_join_as_passenger %}
+        <button type="submit" name="join_role" value="passenger">
+            Join as Passenger
+        </button>
+        {% endif %}
     </form>
     {% elif already_joined %}
     <p>You have already joined this ride.</p>
@@ -54,18 +76,32 @@ Description: Detail view template for a Ride record and related data.
 
 <section class="panel">
     <h3>Participants</h3>
+    <p>
+        <strong>Driver:</strong>
+        {% if ride.driver %}
+        {{ ride.driver.display_name }}
+        {% else %}
+        <span class="need-driver">Needs driver</span>
+        {% endif %}
+    </p>
+
+    <h4>Passengers</h4>
+    {% if participants %}
     <ul>
-        {% for p in participants %}
-        <li>
-            <a href="{% url 'campus_pickup:participant_detail' p.pk %}">
-                {{ p.passenger.display_name }}
-            </a>
-            (joined {{ p.joined_at }})
-        </li>
-        {% empty %}
-        <li>No participants.</li>
-        {% endfor %}
+            {% for p in participants %}
+            {% if p.passenger != ride.driver %}
+            <li>
+                <a href="{% url 'campus_pickup:participant_detail' p.pk %}">
+                    {{ p.passenger.display_name }}
+                </a>
+                (joined {{ p.joined_at }})
+            </li>
+            {% endif %}
+            {% endfor %}
     </ul>
+    {% else %}
+    <p>No passengers have joined yet.</p>
+    {% endif %}
 </section>
 
 <section class="panel">

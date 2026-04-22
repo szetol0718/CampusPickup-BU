@@ -15,6 +15,17 @@ from .forms import CreateProfileForm, RideForm, RideMessageForm
 from .models import Profile, Ride, RideMessage, RideParticipant
 
 
+def update_ride_status(ride):
+    """Update ride status from current driver and seat usage."""
+    if ride.is_full():
+        ride.status = "full"
+    elif ride.driver:
+        ride.status = "accepted"
+    else:
+        ride.status = "open"
+    ride.save()
+
+
 class ProfileRequiredMixin(LoginRequiredMixin):
     """Require login and a campus pickup profile for mutating ride actions."""
 
@@ -59,6 +70,9 @@ def home(request):
         ),
         "driving_rides": Ride.objects.filter(driver=profile).order_by("pickup_time"),
         "my_rides": my_rides,
+        "my_passenger_ride_ids": list(
+            RideParticipant.objects.filter(passenger=profile).values_list("ride_id", flat=True)
+        ),
         "unread_message_count": RideMessage.objects.filter(ride__in=my_rides).count(),
     }
     return render(request, "campus_pickup/home.html", context)
@@ -205,7 +219,11 @@ class RideListView(ProfileRequiredMixin, ListView):
         context["current_query"] = self.request.GET.get("q", "").strip()
         context["current_status"] = self.request.GET.get("status", "").strip()
         context["status_choices"] = Ride.STATUS_CHOICES
-        context["my_profile"] = self.get_my_profile()
+        my_profile = self.get_my_profile()
+        context["my_profile"] = my_profile
+        context["my_passenger_ride_ids"] = list(
+            RideParticipant.objects.filter(passenger=my_profile).values_list("ride_id", flat=True)
+        )
         return context
 
 
@@ -236,12 +254,26 @@ class RideDetailView(ProfileRequiredMixin, DetailView):
 
         context["my_profile"] = my_profile
         context["already_joined"] = already_joined
-        context["can_join"] = (
+        context["can_join_as_driver"] = (
+            my_profile is not None
+            and not already_joined
+            and self.object.creator != my_profile
+            and self.object.driver is None
+        )
+        context["can_join_as_passenger"] = (
             my_profile is not None
             and not already_joined
             and self.object.creator != my_profile
             and self.object.driver != my_profile
             and self.object.seats_remaining() > 0
+            and (self.object.driver is not None or self.object.seats_remaining() > 1)
+        )
+        context["can_join"] = (
+            context["can_join_as_driver"] or context["can_join_as_passenger"]
+        )
+        context["can_quit"] = (
+            my_profile is not None
+            and (already_joined or self.object.driver == my_profile)
         )
         context["can_view_messages"] = (
             already_joined
@@ -267,7 +299,11 @@ class MyRideListView(ProfileRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Add the current user's Profile to the page."""
         context = super().get_context_data(**kwargs)
-        context["my_profile"] = self.get_my_profile()
+        my_profile = self.get_my_profile()
+        context["my_profile"] = my_profile
+        context["my_passenger_ride_ids"] = list(
+            RideParticipant.objects.filter(passenger=my_profile).values_list("ride_id", flat=True)
+        )
         return context
 
 
@@ -280,12 +316,20 @@ class RideCreateView(ProfileRequiredMixin, CreateView):
     success_url = reverse_lazy("campus_pickup:ride_list")
 
     def form_valid(self, form):
-        """Assign creator, role-derived driver, and automatic status."""
+        """Assign creator role and automatic status."""
         profile = self.get_my_profile()
         form.instance.creator = profile
         form.instance.driver = profile if form.cleaned_data["ride_role"] == "driver" else None
-        form.instance.status = "full" if form.instance.seat_capacity <= 1 else "open"
-        return super().form_valid(form)
+        form.instance.status = "open"
+
+        response = super().form_valid(form)
+
+        if form.cleaned_data["ride_role"] == "requester":
+            RideParticipant.objects.get_or_create(ride=self.object, passenger=profile)
+
+        update_ride_status(self.object)
+
+        return response
 
 
 class RideUpdateView(ProfileRequiredMixin, UpdateView):
@@ -311,8 +355,18 @@ class RideUpdateView(ProfileRequiredMixin, UpdateView):
         profile = self.get_my_profile()
         form.instance.creator = profile
         form.instance.driver = profile if form.cleaned_data["ride_role"] == "driver" else None
-        form.instance.status = "full" if form.instance.is_full() else "open"
-        return super().form_valid(form)
+        form.instance.status = "open"
+
+        response = super().form_valid(form)
+
+        if form.cleaned_data["ride_role"] == "driver":
+            RideParticipant.objects.filter(ride=self.object, passenger=profile).delete()
+        else:
+            RideParticipant.objects.get_or_create(ride=self.object, passenger=profile)
+
+        update_ride_status(self.object)
+
+        return response
 
     def get_success_url(self):
         """Return the detail page after a successful update."""
@@ -342,11 +396,40 @@ def join_ride(request, pk):
     if not passenger:
         return redirect("campus_pickup:profile_create")
 
-    if passenger not in [ride.creator, ride.driver] and not ride.is_full():
+    join_role = request.POST.get("join_role")
+
+    if join_role == "driver" and ride.driver is None and passenger != ride.creator:
+        ride.driver = passenger
+        update_ride_status(ride)
+    elif (
+        join_role == "passenger"
+        and passenger != ride.driver
+        and not ride.is_full()
+        and (ride.driver is not None or ride.seats_remaining() > 1)
+    ):
         RideParticipant.objects.get_or_create(ride=ride, passenger=passenger)
-        if ride.is_full():
-            ride.status = "full"
-            ride.save()
+        update_ride_status(ride)
+
+    return redirect("campus_pickup:ride_detail", pk=ride.pk)
+
+
+@login_required(login_url=reverse_lazy("campus_pickup:login"))
+def quit_ride(request, pk):
+    """Remove the logged-in user from a ride as driver or passenger."""
+    ride = get_object_or_404(Ride, pk=pk)
+    if request.method != "POST":
+        return redirect("campus_pickup:ride_detail", pk=ride.pk)
+
+    profile = Profile.objects.filter(user=request.user).first()
+    if not profile:
+        return redirect("campus_pickup:profile_create")
+
+    if ride.driver == profile:
+        ride.driver = None
+        ride.save()
+
+    RideParticipant.objects.filter(ride=ride, passenger=profile).delete()
+    update_ride_status(ride)
 
     return redirect("campus_pickup:ride_detail", pk=ride.pk)
 

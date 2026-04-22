@@ -74,8 +74,14 @@ class Ride(models.Model):
         )
 
     def seats_taken(self):
-        """Return occupied seats, including the ride creator."""
-        return RideParticipant.objects.filter(ride=self).count() + 1
+        """Return occupied seats from passengers plus driver."""
+        passenger_ids = set(
+            RideParticipant.objects.filter(ride=self).values_list("passenger_id", flat=True)
+        )
+        occupied = len(passenger_ids)
+        if self.driver and self.driver_id not in passenger_ids:
+            occupied += 1
+        return occupied
 
     def seats_remaining(self):
         """Return the number of remaining seats."""

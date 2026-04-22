@@ -36,6 +36,7 @@ urlpatterns = [
     path("rides/<int:pk>/update/", views.RideUpdateView.as_view(), name="ride_update"),
     path("rides/<int:pk>/delete/", views.RideDeleteView.as_view(), name="ride_delete"),
     path("rides/<int:pk>/join/", views.join_ride, name="join_ride"),
+    path("rides/<int:pk>/quit/", views.quit_ride, name="quit_ride"),
     path("participants/", views.RideParticipantListView.as_view(), name="participant_list"),
     path("participants/<int:pk>/",
         views.RideParticipantDetailView.as_view(),

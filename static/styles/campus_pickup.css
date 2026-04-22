@@ -161,15 +161,6 @@ th {
     background: #edf4f6;
 }
 
-.clickable-row {
-    cursor: pointer;
-}
-
-.clickable-row:hover,
-.clickable-row:focus {
-    background: #f4fafb;
-}
-
 .filters {
     display: flex;
     flex-wrap: wrap;
@@ -203,6 +194,16 @@ th {
     display: block;
     font-size: 0.9rem;
     margin-top: 0.25rem;
+}
+
+.need-driver {
+    background: #fff2c2;
+    border: 1px solid #d7ad35;
+    border-radius: 6px;
+    color: #6f5100;
+    display: inline-block;
+    font-weight: bold;
+    padding: 0.15rem 0.45rem;
 }
 
 .filters button {
