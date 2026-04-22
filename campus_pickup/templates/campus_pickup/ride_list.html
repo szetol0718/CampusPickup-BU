@@ -7,9 +7,10 @@ Description: List view template for Ride records with basic filtering.
 
 {% block content %}
 <section class="panel">
-    <h2>Rides</h2>
+    <h2>Find Rides</h2>
     <p>
-        <a class="button-link" href="{% url 'campus_pickup:ride_create' %}">Create New Ride</a>
+        <a class="button-link" href="{% url 'campus_pickup:ride_create' %}">Create Ride</a>
+        <a class="button-link" href="{% url 'campus_pickup:my_rides' %}">My Rides</a>
     </p>
 
     <form method="get" class="filters">
@@ -39,6 +40,7 @@ Description: List view template for Ride records with basic filtering.
                 <th>Time</th>
                 <th>Status</th>
                 <th>Seats Left</th>
+                <th>My Role</th>
             </tr>
         </thead>
         <tbody>
@@ -51,10 +53,13 @@ Description: List view template for Ride records with basic filtering.
                 <td>{{ r.pickup_time }}</td>
                 <td>{{ r.get_status_display }}</td>
                 <td>{{ r.seats_remaining }}</td>
+                <td>
+                    {% if r.creator == my_profile %}Creator{% elif r.driver == my_profile %}Driver{% else %}-{% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7">No rides found.</td>
+                <td colspan="8">No rides found.</td>
             </tr>
             {% endfor %}
         </tbody>

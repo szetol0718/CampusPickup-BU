@@ -1,21 +1,18 @@
 <!--
-File: campus_pickup/templates/campus_pickup/home.html
-Author: Louis Szeto (szetol@bu.edu), 4/21/2026
-Description: Logged-in dashboard for campus pickup users.
+File: campus_pickup/templates/campus_pickup/my_ride_list.html
+Author: Louis Szeto (szetol@bu.edu), 4/22/2026
+Description: List view for rides related to the logged-in user.
 -->
 {% extends "campus_pickup/base.html" %}
 
 {% block content %}
 <section class="panel">
-    <h2>My Upcoming Rides</h2>
-    <p>
-        Ride summary: {{ created_rides.count }} created, {{ joined_rides.count }} joined,
-        {{ driving_rides.count }} driving, {{ unread_message_count }} messages.
-    </p>
+    <h2>My Rides</h2>
     <p>
         <a class="button-link" href="{% url 'campus_pickup:ride_create' %}">Create Ride</a>
         <a class="button-link" href="{% url 'campus_pickup:ride_list' %}">Find Rides</a>
     </p>
+
     <table>
         <thead>
             <tr>
@@ -24,24 +21,26 @@ Description: Logged-in dashboard for campus pickup users.
                 <th>Destination</th>
                 <th>Time</th>
                 <th>Status</th>
-                <th>Role</th>
+                <th>Seats Left</th>
+                <th>My Role</th>
             </tr>
         </thead>
         <tbody>
-            {% for r in my_rides %}
+            {% for r in rides %}
             <tr>
                 <td><a href="{% url 'campus_pickup:ride_detail' r.pk %}">Ride #{{ r.id }}</a></td>
                 <td>{{ r.pickup_location }}</td>
                 <td>{{ r.destination }}</td>
                 <td>{{ r.pickup_time }}</td>
                 <td>{{ r.get_status_display }}</td>
+                <td>{{ r.seats_remaining }}</td>
                 <td>
-                    {% if r.creator == profile %}Creator{% elif r.driver == profile %}Driver{% else %}Passenger{% endif %}
+                    {% if r.creator == my_profile %}Creator{% elif r.driver == my_profile %}Driver{% else %}Passenger{% endif %}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6">You do not have any rides yet.</td>
+                <td colspan="7">You have not created, joined, or driven any rides yet.</td>
             </tr>
             {% endfor %}
         </tbody>

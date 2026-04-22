@@ -16,12 +16,11 @@ Description: Shared base template and navigation for campus pickup views.
     <header>
         <h1>Campus Pickup</h1>
         <nav>
-            <a href="{% url 'campus_pickup:home' %}">Home</a>
-            <a href="{% url 'campus_pickup:profile_list' %}">Profiles</a>
-            <a href="{% url 'campus_pickup:ride_list' %}">Rides</a>
-            <a href="{% url 'campus_pickup:participant_list' %}">Ride Participants</a>
-            <a href="{% url 'campus_pickup:message_list' %}">Ride Messages</a>
             {% if user.is_authenticated %}
+            <a href="{% url 'campus_pickup:home' %}">Home</a>
+            <a href="{% url 'campus_pickup:my_profile' %}">My Profile</a>
+            <a href="{% url 'campus_pickup:ride_list' %}">Find Rides</a>
+            <a href="{% url 'campus_pickup:my_rides' %}">My Rides</a>
             <span class="nav-status">Logged in as {{ user.username }}</span>
             <form method="post" action="{% url 'campus_pickup:logout' %}" class="nav-form">
                 {% csrf_token %}

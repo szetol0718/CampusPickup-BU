@@ -7,11 +7,11 @@ Description: Login page for campus pickup using Django auth LoginView.
 
 {% block content %}
 <section class="panel">
-    <h2>Login</h2>
+    <h2>Login to Campus Pickup</h2>
     <form method="post" class="form-grid">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="hidden" name="next" value="{{ next|default:'/campus_pickup/rides/' }}">
+        <input type="hidden" name="next" value="{{ next|default:'/campus_pickup/' }}">
         <button type="submit">Login</button>
     </form>
     <p>

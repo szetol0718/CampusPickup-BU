@@ -13,7 +13,10 @@ urlpatterns = [
     path("", views.home, name="home"),
     path(
         "login/",
-        auth_views.LoginView.as_view(template_name="campus_pickup/login.html"),
+        auth_views.LoginView.as_view(
+            template_name="campus_pickup/login.html",
+            redirect_authenticated_user=True,
+        ),
         name="login",
     ),
     path(
@@ -26,12 +29,14 @@ urlpatterns = [
         TemplateView.as_view(template_name="campus_pickup/logged_out.html"),
         name="logout_confirmation",
     ),
+    path("profile/", views.MyProfileDetailView.as_view(), name="my_profile"),
     path("profiles/", views.ProfileListView.as_view(), name="profile_list"),
     path("profiles/create/", views.ProfileCreateView.as_view(), name="profile_create"),
     path("profiles/<int:pk>/", views.ProfileDetailView.as_view(), name="profile_detail"),
     path("profiles/<int:pk>/update/", views.ProfileUpdateView.as_view(), name="profile_update"),
     path("profiles/<int:pk>/delete/", views.ProfileDeleteView.as_view(), name="profile_delete"),
     path("rides/", views.RideListView.as_view(), name="ride_list"),
+    path("rides/my/", views.MyRideListView.as_view(), name="my_rides"),
     path("rides/create/", views.RideCreateView.as_view(), name="ride_create"),
     path("rides/<int:pk>/", views.RideDetailView.as_view(), name="ride_detail"),
     path("rides/<int:pk>/update/", views.RideUpdateView.as_view(), name="ride_update"),

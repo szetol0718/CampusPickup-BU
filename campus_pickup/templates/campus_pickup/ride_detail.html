@@ -8,10 +8,13 @@ Description: Detail view template for a Ride record and related data.
 {% block content %}
 <section class="panel">
     <h2>Ride #{{ ride.id }}</h2>
+    <p><a href="{% url 'campus_pickup:my_rides' %}">Back to My Rides</a></p>
+    {% if ride.creator == my_profile %}
     <p>
         <a class="button-link" href="{% url 'campus_pickup:ride_update' ride.pk %}">Edit Ride</a>
         <a class="button-link danger-link" href="{% url 'campus_pickup:ride_delete' ride.pk %}">Delete Ride</a>
     </p>
+    {% endif %}
     <p><strong>Creator:</strong> {{ ride.creator.display_name }}</p>
     <p><strong>Driver:</strong> {% if ride.driver %}{{ ride.driver.display_name }}{% else %}(none){% endif %}</p>
     <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
@@ -59,9 +62,10 @@ Description: Detail view template for a Ride record and related data.
 
 <section class="panel">
     <h3>Messages</h3>
+    {% if can_view_messages %}
     <p>
         <a class="button-link" href="{% url 'campus_pickup:message_create' %}?ride={{ ride.pk }}">
-            Add Message For This Ride
+            Add Message
         </a>
     </p>
     <ul>
@@ -76,5 +80,8 @@ Description: Detail view template for a Ride record and related data.
         <li>No messages.</li>
         {% endfor %}
     </ul>
+    {% else %}
+    <p>Join this ride to see and send messages.</p>
+    {% endif %}
 </section>
 {% endblock %}
