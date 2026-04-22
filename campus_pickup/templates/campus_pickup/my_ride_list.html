@@ -40,7 +40,7 @@ Description: List view for rides related to the logged-in user.
                 <td><a href="{% url 'campus_pickup:ride_detail' r.pk %}">Ride #{{ r.id }}</a></td>
                 <td>{{ r.pickup_location }}</td>
                 <td>{{ r.destination }}</td>
-                <td>{{ r.pickup_time }}</td>
+                <td>{% if r.pickup_time %}{{ r.pickup_time }}{% else %}Real-time{% endif %}</td>
                 <td>{{ r.get_status_display }}</td>
                 <td>{{ r.seats_remaining }}</td>
                 <td>

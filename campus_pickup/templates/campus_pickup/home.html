@@ -42,7 +42,7 @@ Description: Logged-in dashboard for campus pickup users.
                 <td><a href="{% url 'campus_pickup:ride_detail' r.pk %}">Ride #{{ r.id }}</a></td>
                 <td>{{ r.pickup_location }}</td>
                 <td>{{ r.destination }}</td>
-                <td>{{ r.pickup_time }}</td>
+                <td>{% if r.pickup_time %}{{ r.pickup_time }}{% else %}Real-time{% endif %}</td>
                 <td>{{ r.get_status_display }}</td>
                 <td>
                     {% if r.creator == profile %}Creator{% elif r.driver == profile %}Driver{% else %}Passenger{% endif %}

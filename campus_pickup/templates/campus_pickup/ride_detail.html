@@ -28,11 +28,10 @@ Description: Detail view template for a Ride record and related data.
     <p><strong>Driver:</strong> {% if ride.driver %}{{ ride.driver.display_name }}{% else %}(none){% endif %}</p>
     <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
     <p><strong>Destination:</strong> {{ ride.destination }}</p>
-    <p><strong>Pickup Time:</strong> {{ ride.pickup_time }}</p>
+    <p><strong>Pickup Time:</strong> {% if ride.pickup_time %}{{ ride.pickup_time }}{% else %}Real-time{% endif %}</p>
     <p><strong>Request Type:</strong> {{ ride.get_request_type_display }}</p>
     <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
-    <p><strong>Seat Capacity:</strong> {{ ride.seat_capacity }}</p>
-    <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }}</p>
+    <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }} / {{ ride.seat_capacity }}  </p>
 
     <h3>Join This Ride</h3>
     {% if can_join %}

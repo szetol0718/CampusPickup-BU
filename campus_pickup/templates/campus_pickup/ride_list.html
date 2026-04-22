@@ -61,7 +61,7 @@ Description: List view template for Ride records with basic filtering.
             >
                 <td>{{ r.pickup_location }}</td>
                 <td>{{ r.destination }}</td>
-                <td>{{ r.pickup_time }}</td>
+                <td>{% if r.pickup_time %}{{ r.pickup_time }}{% else %}Real-time{% endif %}</td>
                 <td>{{ r.get_status_display }}</td>
                 <td>{{ r.seats_remaining }}</td>
                 <td>

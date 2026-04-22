@@ -26,7 +26,20 @@ class CreateProfileForm(forms.ModelForm):
 class RideForm(forms.ModelForm):
     """Form for creating and updating Ride records."""
 
+    RIDE_ROLE_CHOICES = [
+        ("driver", "I am driving"),
+        ("requester", "I need a ride"),
+    ]
+
+    ride_role = forms.ChoiceField(
+        choices=RIDE_ROLE_CHOICES,
+        label="Create this ride as",
+    )
+
     pickup_time = forms.DateTimeField(
+        required=False,
+        label="Pickup time for reservation",
+        help_text="Leave blank for real-time rides.",
         input_formats=["%Y-%m-%dT%H:%M"],
         widget=forms.DateTimeInput(
             attrs={"type": "datetime-local"},
@@ -39,14 +52,32 @@ class RideForm(forms.ModelForm):
 
         model = Ride
         fields = [
-            "driver",
+            "ride_role",
+            "request_type",
             "pickup_location",
             "destination",
             "pickup_time",
-            "request_type",
-            "status",
             "seat_capacity",
         ]
+        labels = {
+            "seat_capacity": "Total seats, including you",
+        }
+        widgets = {
+            "seat_capacity": forms.NumberInput(attrs={"min": 1}),
+        }
+
+    def clean(self):
+        """Require a pickup time only for reservation rides."""
+        cleaned_data = super().clean()
+        request_type = cleaned_data.get("request_type")
+        pickup_time = cleaned_data.get("pickup_time")
+
+        if request_type == "reservation" and not pickup_time:
+            self.add_error("pickup_time", "Reservation rides need a pickup time.")
+        elif request_type == "realtime":
+            cleaned_data["pickup_time"] = None
+
+        return cleaned_data
 
 
 class RideMessageForm(forms.ModelForm):

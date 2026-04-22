@@ -280,8 +280,11 @@ class RideCreateView(ProfileRequiredMixin, CreateView):
     success_url = reverse_lazy("campus_pickup:ride_list")
 
     def form_valid(self, form):
-        """Assign the logged-in user's Profile as the ride creator."""
-        form.instance.creator = self.get_my_profile()
+        """Assign creator, role-derived driver, and automatic status."""
+        profile = self.get_my_profile()
+        form.instance.creator = profile
+        form.instance.driver = profile if form.cleaned_data["ride_role"] == "driver" else None
+        form.instance.status = "full" if form.instance.seat_capacity <= 1 else "open"
         return super().form_valid(form)
 
 
@@ -292,9 +295,24 @@ class RideUpdateView(ProfileRequiredMixin, UpdateView):
     template_name = "campus_pickup/ride_form.html"
     form_class = RideForm
 
+    def get_initial(self):
+        """Prefill role choice from the current ride driver."""
+        initial = super().get_initial()
+        ride = self.get_object()
+        initial["ride_role"] = "driver" if ride.driver == self.get_my_profile() else "requester"
+        return initial
+
     def get_queryset(self):
         """Only allow ride creators to update their rides."""
         return Ride.objects.filter(creator=self.get_my_profile())
+
+    def form_valid(self, form):
+        """Keep driver and status controlled by app logic."""
+        profile = self.get_my_profile()
+        form.instance.creator = profile
+        form.instance.driver = profile if form.cleaned_data["ride_role"] == "driver" else None
+        form.instance.status = "full" if form.instance.is_full() else "open"
+        return super().form_valid(form)
 
     def get_success_url(self):
         """Return the detail page after a successful update."""

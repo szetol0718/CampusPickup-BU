@@ -56,7 +56,7 @@ class Ride(models.Model):
 
     pickup_location = models.TextField(blank=False)
     destination = models.TextField(blank=False)
-    pickup_time = models.DateTimeField()
+    pickup_time = models.DateTimeField(null=True, blank=True)
     request_type = models.CharField(max_length=20, choices=REQUEST_TYPES)
     status = models.CharField(
         max_length=20,
@@ -74,12 +74,12 @@ class Ride(models.Model):
         )
 
     def seats_taken(self):
-        """Return the number of passengers currently assigned to this ride."""
-        return RideParticipant.objects.filter(ride=self).count()
+        """Return occupied seats, including the ride creator."""
+        return RideParticipant.objects.filter(ride=self).count() + 1
 
     def seats_remaining(self):
         """Return the number of remaining seats."""
-        return self.seat_capacity - self.seats_taken()
+        return max(self.seat_capacity - self.seats_taken(), 0)
 
     def is_full(self):
         """Return whether the ride has reached seat capacity."""

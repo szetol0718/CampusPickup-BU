@@ -198,6 +198,13 @@ th {
     font: inherit;
 }
 
+.help-text {
+    color: #586a73;
+    display: block;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
 .filters button {
     background: var(--accent);
     border: none;
