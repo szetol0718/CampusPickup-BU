@@ -161,6 +161,15 @@ th {
     background: #edf4f6;
 }
 
+.clickable-row {
+    cursor: pointer;
+}
+
+.clickable-row:hover,
+.clickable-row:focus {
+    background: #f4fafb;
+}
+
 .filters {
     display: flex;
     flex-wrap: wrap;
