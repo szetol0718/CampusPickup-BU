@@ -23,19 +23,19 @@ Description: Detail view template for a Ride record and related data.
     <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }}</p>
 
     <h3>Join This Ride</h3>
-    {% if ride.seats_remaining > 0 and joinable_profiles %}
+    {% if can_join %}
     <form method="post" action="{% url 'campus_pickup:join_ride' ride.pk %}" class="filters">
         {% csrf_token %}
-        <label for="profile_id">Passenger:</label>
-        <select name="profile_id" id="profile_id" required>
-            {% for p in joinable_profiles %}
-            <option value="{{ p.pk }}">{{ p.display_name }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Join Ride</button>
+        <button type="submit">Join Ride as {{ my_profile.display_name }}</button>
     </form>
+    {% elif already_joined %}
+    <p>You have already joined this ride.</p>
+    {% elif not user.is_authenticated %}
+    <p><a href="{% url 'campus_pickup:login' %}?next={{ request.path }}">Log in</a> to join this ride.</p>
+    {% elif not my_profile %}
+    <p><a href="{% url 'campus_pickup:profile_create' %}">Create a profile</a> before joining rides.</p>
     {% elif ride.seats_remaining > 0 %}
-    <p>No additional profiles are available to join this ride.</p>
+    <p>This ride is available, but your profile cannot join it right now.</p>
     {% else %}
     <p>This ride is full. No more passengers can join.</p>
     {% endif %}

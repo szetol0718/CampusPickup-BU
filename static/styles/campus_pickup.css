@@ -54,6 +54,31 @@ nav a:hover {
     background: var(--accent-dark);
 }
 
+.nav-form {
+    margin: 0;
+}
+
+.nav-form button,
+.form-grid button {
+    background: var(--accent);
+    border: none;
+    color: #ffffff;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    padding: 0.45rem 0.8rem;
+}
+
+.nav-form button:hover,
+.form-grid button:hover {
+    background: var(--accent-dark);
+}
+
+.nav-status {
+    align-self: center;
+    color: #40515c;
+}
+
 .button-link {
     text-decoration: none;
     color: #ffffff;

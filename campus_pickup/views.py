@@ -3,12 +3,34 @@
 # Description: List and detail interfaces for campus pickup models.
 
 from django.db.models import Q
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from .forms import RideForm, RideMessageForm
+from .forms import CreateProfileForm, RideForm, RideMessageForm
 from .models import Profile, Ride, RideMessage, RideParticipant
+
+
+class ProfileRequiredMixin(LoginRequiredMixin):
+    """Require login and a campus pickup profile for mutating ride actions."""
+
+    def get_login_url(self):
+        """Return the campus pickup login page."""
+        return reverse("campus_pickup:login")
+
+    def get_my_profile(self):
+        """Return the Profile for the logged-in user."""
+        return get_object_or_404(Profile, user=self.request.user)
+
+    def dispatch(self, request, *args, **kwargs):
+        """Send logged-in users without a profile to profile creation first."""
+        if request.user.is_authenticated and not Profile.objects.filter(user=request.user).exists():
+            return redirect("campus_pickup:profile_create")
+        return super().dispatch(request, *args, **kwargs)
 
 
 def home(request):
@@ -43,32 +65,84 @@ class ProfileDetailView(DetailView):
 
 
 class ProfileCreateView(CreateView):
-    """Create a new profile record."""
+    """Create a User account and related Profile, or add a Profile for a logged-in User."""
 
     model = Profile
     template_name = "campus_pickup/profile_form.html"
-    fields = ["user", "display_name", "bio_text", "profile_image_url"]
-    success_url = reverse_lazy("campus_pickup:profile_list")
+    form_class = CreateProfileForm
+
+    def dispatch(self, request, *args, **kwargs):
+        """Avoid creating duplicate profiles for a logged-in user."""
+        if request.user.is_authenticated:
+            profile = Profile.objects.filter(user=request.user).first()
+            if profile:
+                return redirect("campus_pickup:profile_detail", pk=profile.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """Add a UserCreationForm when the visitor is not logged in."""
+        context = super().get_context_data(**kwargs)
+        if not self.request.user.is_authenticated and "user_form" not in context:
+            context["user_form"] = UserCreationForm(prefix="user")
+        return context
+
+    def form_valid(self, form):
+        """Attach the Profile to a User, creating and logging in a User if needed."""
+        if self.request.user.is_authenticated:
+            form.instance.user = self.request.user
+            return super().form_valid(form)
+
+        user_form = UserCreationForm(self.request.POST, prefix="user")
+        if not user_form.is_valid():
+            return self.render_to_response(
+                self.get_context_data(form=form, user_form=user_form)
+            )
+
+        user = user_form.save()
+        login(self.request, user, backend="django.contrib.auth.backends.ModelBackend")
+        form.instance.user = user
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        """Keep both account and profile validation errors visible."""
+        user_form = None
+        if not self.request.user.is_authenticated:
+            user_form = UserCreationForm(self.request.POST, prefix="user")
+        return self.render_to_response(
+            self.get_context_data(form=form, user_form=user_form)
+        )
+
+    def get_success_url(self):
+        """Return the new profile detail page after creation."""
+        return reverse("campus_pickup:profile_detail", kwargs={"pk": self.object.pk})
 
 
-class ProfileUpdateView(UpdateView):
+class ProfileUpdateView(ProfileRequiredMixin, UpdateView):
     """Update an existing profile record."""
 
     model = Profile
     template_name = "campus_pickup/profile_form.html"
-    fields = ["user", "display_name", "bio_text", "profile_image_url"]
+    fields = ["display_name", "bio_text", "profile_image_url"]
+
+    def get_queryset(self):
+        """Only allow users to update their own profile."""
+        return Profile.objects.filter(user=self.request.user)
 
     def get_success_url(self):
         """Return the profile detail page after a successful update."""
         return reverse("campus_pickup:profile_detail", kwargs={"pk": self.object.pk})
 
 
-class ProfileDeleteView(DeleteView):
+class ProfileDeleteView(ProfileRequiredMixin, DeleteView):
     """Delete an existing profile record."""
 
     model = Profile
     template_name = "campus_pickup/profile_confirm_delete.html"
     success_url = reverse_lazy("campus_pickup:profile_list")
+
+    def get_queryset(self):
+        """Only allow users to delete their own profile."""
+        return Profile.objects.filter(user=self.request.user)
 
 
 class RideListView(ListView):
@@ -118,16 +192,26 @@ class RideDetailView(DetailView):
         context["messages"] = RideMessage.objects.filter(ride=self.object).select_related(
             "sender"
         ).order_by("-timestamp")
-        participant_ids = RideParticipant.objects.filter(ride=self.object).values_list(
-            "passenger_id", flat=True
-        )
-        context["joinable_profiles"] = Profile.objects.exclude(id__in=participant_ids).order_by(
-            "display_name"
+        my_profile = None
+        already_joined = False
+        if self.request.user.is_authenticated:
+            my_profile = Profile.objects.filter(user=self.request.user).first()
+            already_joined = RideParticipant.objects.filter(
+                ride=self.object,
+                passenger=my_profile,
+            ).exists() if my_profile else False
+
+        context["my_profile"] = my_profile
+        context["already_joined"] = already_joined
+        context["can_join"] = (
+            my_profile is not None
+            and not already_joined
+            and self.object.seats_remaining() > 0
         )
         return context
 
 
-class RideCreateView(CreateView):
+class RideCreateView(ProfileRequiredMixin, CreateView):
     """Create a new ride record."""
 
     model = Ride
@@ -135,8 +219,13 @@ class RideCreateView(CreateView):
     form_class = RideForm
     success_url = reverse_lazy("campus_pickup:ride_list")
 
+    def form_valid(self, form):
+        """Assign the logged-in user's Profile as the ride creator."""
+        form.instance.creator = self.get_my_profile()
+        return super().form_valid(form)
 
-class RideUpdateView(UpdateView):
+
+class RideUpdateView(ProfileRequiredMixin, UpdateView):
     """Update an existing ride record."""
 
     model = Ride
@@ -148,7 +237,7 @@ class RideUpdateView(UpdateView):
         return reverse("campus_pickup:ride_detail", kwargs={"pk": self.object.pk})
 
 
-class RideDeleteView(DeleteView):
+class RideDeleteView(ProfileRequiredMixin, DeleteView):
     """Delete an existing ride record."""
 
     model = Ride
@@ -156,14 +245,14 @@ class RideDeleteView(DeleteView):
     success_url = reverse_lazy("campus_pickup:ride_list")
 
 
+@login_required(login_url=reverse_lazy("campus_pickup:login"))
 def join_ride(request, pk):
     """Handle ride join requests submitted from the ride detail view."""
     ride = get_object_or_404(Ride, pk=pk)
     if request.method != "POST":
         return redirect("campus_pickup:ride_detail", pk=ride.pk)
 
-    profile_id = request.POST.get("profile_id")
-    passenger = get_object_or_404(Profile, pk=profile_id)
+    passenger = get_object_or_404(Profile, user=request.user)
 
     if not ride.is_full():
         RideParticipant.objects.get_or_create(ride=ride, passenger=passenger)
@@ -214,7 +303,7 @@ class RideMessageDetailView(DetailView):
     context_object_name = "message"
 
 
-class RideMessageCreateView(CreateView):
+class RideMessageCreateView(ProfileRequiredMixin, CreateView):
     """Create a new ride-message record."""
 
     model = RideMessage
@@ -233,8 +322,13 @@ class RideMessageCreateView(CreateView):
         """Return the related ride detail page after creating a message."""
         return reverse("campus_pickup:ride_detail", kwargs={"pk": self.object.ride.pk})
 
+    def form_valid(self, form):
+        """Assign the logged-in user's Profile as the message sender."""
+        form.instance.sender = self.get_my_profile()
+        return super().form_valid(form)
 
-class RideMessageUpdateView(UpdateView):
+
+class RideMessageUpdateView(ProfileRequiredMixin, UpdateView):
     """Update an existing ride-message record."""
 
     model = RideMessage
@@ -246,7 +340,7 @@ class RideMessageUpdateView(UpdateView):
         return reverse("campus_pickup:message_detail", kwargs={"pk": self.object.pk})
 
 
-class RideMessageDeleteView(DeleteView):
+class RideMessageDeleteView(ProfileRequiredMixin, DeleteView):
     """Delete an existing ride-message record."""
 
     model = RideMessage

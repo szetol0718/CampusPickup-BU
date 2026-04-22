@@ -1,0 +1,22 @@
+<!--
+File: campus_pickup/templates/campus_pickup/login.html
+Author: Louis Szeto (szetol@bu.edu), 4/21/2026
+Description: Login page for campus pickup using Django auth LoginView.
+-->
+{% extends "campus_pickup/base.html" %}
+
+{% block content %}
+<section class="panel">
+    <h2>Login</h2>
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="next" value="{{ next|default:'/campus_pickup/rides/' }}">
+        <button type="submit">Login</button>
+    </form>
+    <p>
+        Need an account?
+        <a href="{% url 'campus_pickup:profile_create' %}">Create one here</a>.
+    </p>
+</section>
+{% endblock %}

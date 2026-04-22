@@ -10,10 +10,15 @@ Description: Form template for creating a profile.
     {% if object %}
     <h2>Edit Profile #{{ object.id }}</h2>
     {% else %}
-    <h2>Create New Profile</h2>
+    <h2>Create Account and Profile</h2>
     {% endif %}
     <form method="post" class="form-grid">
         {% csrf_token %}
+        {% if user_form %}
+        <h3>Account Login</h3>
+        {{ user_form.as_p }}
+        <h3>Campus Profile</h3>
+        {% endif %}
         {{ form.as_p }}
         <button type="submit">Save Profile</button>
     </form>

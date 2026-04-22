@@ -4,7 +4,17 @@
 
 from django import forms
 
-from .models import Ride, RideMessage
+from .models import Profile, Ride, RideMessage
+
+
+class CreateProfileForm(forms.ModelForm):
+    """Form for creating a Profile after a User account exists."""
+
+    class Meta:
+        """Metadata for CreateProfileForm fields."""
+
+        model = Profile
+        fields = ["display_name", "bio_text", "profile_image_url"]
 
 
 class RideForm(forms.ModelForm):
@@ -23,7 +33,6 @@ class RideForm(forms.ModelForm):
 
         model = Ride
         fields = [
-            "creator",
             "driver",
             "pickup_location",
             "destination",
@@ -41,7 +50,7 @@ class RideMessageForm(forms.ModelForm):
         """Metadata for RideMessageForm fields."""
 
         model = RideMessage
-        fields = ["ride", "sender", "text"]
+        fields = ["ride", "text"]
         widgets = {
             "text": forms.Textarea(attrs={"rows": 4}),
         }
