@@ -12,14 +12,40 @@ Description: Form template for creating a profile.
     {% else %}
     <h2>Create Account and Profile</h2>
     {% endif %}
-    <form method="post" class="form-grid">
+    <form method="post" enctype="multipart/form-data" class="form-grid">
         {% csrf_token %}
         {% if user_form %}
         <h3>Account Login</h3>
         {{ user_form.as_p }}
         <h3>Campus Profile</h3>
         {% endif %}
-        {{ form.as_p }}
+        <p>
+            {{ form.display_name.label_tag }}
+            {{ form.display_name }}
+            {{ form.display_name.errors }}
+        </p>
+        <p>
+            {{ form.bio_text.label_tag }}
+            {{ form.bio_text }}
+            {{ form.bio_text.errors }}
+        </p>
+        {% if object.profile_image_url %}
+        <p>
+            <img
+                class="profile-avatar"
+                src="{{ object.profile_image_url.url }}"
+                alt="{{ object.display_name }}"
+                width="72"
+                height="72"
+                style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover;"
+            >
+        </p>
+        {% endif %}
+        <p>
+            {{ form.profile_image_url.label_tag }}
+            {{ form.profile_image_url }}
+            {{ form.profile_image_url.errors }}
+        </p>
         <button type="submit">Save Profile</button>
     </form>
 </section>

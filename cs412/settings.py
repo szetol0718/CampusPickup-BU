@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "rest_framework", ## NEW: Django REST framework
     'dadjokes', # assignment 9 app
     'rest_framework.authtoken',
-    'campus_pickup' #final project
+    'campus_pickup',
 ]
 
 MIDDLEWARE = [

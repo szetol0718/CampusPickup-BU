@@ -154,7 +154,7 @@ class ProfileUpdateView(ProfileRequiredMixin, UpdateView):
 
     model = Profile
     template_name = "campus_pickup/profile_form.html"
-    fields = ["display_name", "bio_text", "profile_image_url"]
+    form_class = CreateProfileForm
 
     def get_queryset(self):
         """Only allow users to update their own profile."""

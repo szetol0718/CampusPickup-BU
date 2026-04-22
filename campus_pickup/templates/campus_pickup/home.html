@@ -7,7 +7,16 @@ Description: Logged-in dashboard for campus pickup users.
 
 {% block content %}
 <section class="panel">
-    <h2>My Upcoming Rides</h2>
+    <div class="page-title">
+        <h2>My Upcoming Rides</h2>
+        {% if profile.profile_image_url %}
+        <img
+            class="profile-avatar title-avatar"
+            src="{{ profile.profile_image_url.url }}"
+            alt="{{ profile.display_name }}"
+        >
+        {% endif %}
+    </div>
     <p>
         Ride summary: {{ created_rides.count }} created, {{ joined_rides.count }} joined,
         {{ driving_rides.count }} driving, {{ unread_message_count }} messages.

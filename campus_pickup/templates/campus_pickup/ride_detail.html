@@ -7,7 +7,16 @@ Description: Detail view template for a Ride record and related data.
 
 {% block content %}
 <section class="panel">
-    <h2>Ride #{{ ride.id }}</h2>
+    <div class="page-title">
+        <h2>Ride #{{ ride.id }}</h2>
+        {% if my_profile.profile_image_url %}
+        <img
+            class="profile-avatar title-avatar"
+            src="{{ my_profile.profile_image_url.url }}"
+            alt="{{ my_profile.display_name }}"
+        >
+        {% endif %}
+    </div>
     <p><a href="{% url 'campus_pickup:my_rides' %}">Back to My Rides</a></p>
     {% if ride.creator == my_profile %}
     <p>

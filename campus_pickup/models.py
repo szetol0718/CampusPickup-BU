@@ -12,7 +12,11 @@ class Profile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     display_name = models.TextField(blank=False)
     bio_text = models.TextField(blank=True)
-    profile_image_url = models.URLField(blank=True)
+    profile_image_url = models.ImageField(
+        "profile image",
+        upload_to="campus_pickup/profile_images/",
+        blank=True,
+    )
     join_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

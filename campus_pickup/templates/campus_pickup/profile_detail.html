@@ -7,7 +7,16 @@ Description: Detail view template for a Profile record.
 
 {% block content %}
 <section class="panel">
-    <h2>My Profile</h2>
+    <div class="page-title">
+        <h2>My Profile</h2>
+        {% if profile.profile_image_url %}
+        <img
+            class="profile-avatar title-avatar"
+            src="{{ profile.profile_image_url.url }}"
+            alt="{{ profile.display_name }}"
+        >
+        {% endif %}
+    </div>
     <p>
         <a class="button-link" href="{% url 'campus_pickup:profile_update' profile.pk %}">Edit Profile</a>
         <a class="button-link danger-link" href="{% url 'campus_pickup:profile_delete' profile.pk %}">Delete Profile</a>
@@ -15,10 +24,8 @@ Description: Detail view template for a Profile record.
     <p><strong>Display Name:</strong> {{ profile.display_name }}</p>
     <p><strong>Username:</strong> {{ profile.user.username }}</p>
     <p><strong>Bio:</strong> {{ profile.bio_text|default:"(none)" }}</p>
-    {% if profile.profile_image_url %}
-    <p><strong>Profile Image URL:</strong> <a href="{{ profile.profile_image_url }}">{{ profile.profile_image_url }}</a></p>
-    {% else %}
-    <p><strong>Profile Image URL:</strong> (none)</p>
+    {% if not profile.profile_image_url %}
+    <p><strong>Profile Image:</strong> (none)</p>
     {% endif %}
     <p><strong>Join Date:</strong> {{ profile.join_date }}</p>
 </section>

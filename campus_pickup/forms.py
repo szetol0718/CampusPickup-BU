@@ -15,6 +15,12 @@ class CreateProfileForm(forms.ModelForm):
 
         model = Profile
         fields = ["display_name", "bio_text", "profile_image_url"]
+        labels = {
+            "profile_image_url": "Profile image",
+        }
+        widgets = {
+            "profile_image_url": forms.FileInput(attrs={"accept": "image/*"}),
+        }
 
 
 class RideForm(forms.ModelForm):
