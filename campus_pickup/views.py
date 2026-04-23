@@ -2,6 +2,8 @@
 # Author: Louis Szeto (szetol@bu.edu), 4/21/2026
 # Description: List and detail interfaces for campus pickup models.
 
+import math
+
 from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth import login
@@ -14,6 +16,22 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from .forms import CreateProfileForm, RideForm, RideMessageForm
 from .models import Profile, Ride, RideMessage, RideParticipant
+
+
+def miles_between(lat1, lon1, lat2, lon2):
+    """Return approximate distance in miles between two coordinate points."""
+    radius = 3958.8
+    lat1 = math.radians(lat1)
+    lon1 = math.radians(lon1)
+    lat2 = math.radians(lat2)
+    lon2 = math.radians(lon2)
+    lat_diff = lat2 - lat1
+    lon_diff = lon2 - lon1
+    a = (
+        math.sin(lat_diff / 2) ** 2
+        + math.cos(lat1) * math.cos(lat2) * math.sin(lon_diff / 2) ** 2
+    )
+    return radius * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
 def update_ride_status(ride):
@@ -147,39 +165,87 @@ class ProfileDeleteView(ProfileRequiredMixin, DeleteView):
 
 
 class RideListView(ProfileRequiredMixin, ListView):
-    """Display rides and allow simple filtering by query and status."""
+    """Display active rides and allow simple text search."""
 
     model = Ride
     template_name = "campus_pickup/ride_list.html"
     context_object_name = "rides"
 
     def get_queryset(self):
-        """Filter rides by optional destination/location text and status."""
+        """Filter active rides by optional destination/location text."""
         queryset = Ride.objects.select_related("creator", "driver").exclude(
             status="completed"
         ).order_by("pickup_time")
         query = self.request.GET.get("q", "").strip()
-        status = self.request.GET.get("status", "").strip()
 
         if query:
             queryset = queryset.filter(
                 Q(destination__icontains=query) | Q(pickup_location__icontains=query)
             )
-        if status:
-            queryset = queryset.filter(status=status)
 
         return queryset
 
     def get_context_data(self, **kwargs):
-        """Include current filter values and status options for the template."""
+        """Include current search value and current user's role data."""
         context = super().get_context_data(**kwargs)
         context["current_query"] = self.request.GET.get("q", "").strip()
-        context["current_status"] = self.request.GET.get("status", "").strip()
-        context["status_choices"] = Ride.STATUS_CHOICES
         my_profile = self.get_my_profile()
         context["my_profile"] = my_profile
         context["my_passenger_ride_ids"] = list(
             RideParticipant.objects.filter(passenger=my_profile).values_list("ride_id", flat=True)
+        )
+        return context
+
+
+class NearbyRideListView(ProfileRequiredMixin, ListView):
+    """Display active rides ordered by pickup distance from the user."""
+
+    model = Ride
+    template_name = "campus_pickup/nearby_ride_list.html"
+    context_object_name = "rides"
+
+    def get_queryset(self):
+        """Return rides nearest to the latitude/longitude in the query string."""
+        self.nearby_latitude = self.request.GET.get("lat", "").strip()
+        self.nearby_longitude = self.request.GET.get("lng", "").strip()
+        if not self.nearby_latitude or not self.nearby_longitude:
+            return []
+
+        try:
+            user_latitude = float(self.nearby_latitude)
+            user_longitude = float(self.nearby_longitude)
+        except ValueError:
+            return []
+
+        rides = Ride.objects.select_related("creator", "driver").exclude(
+            status="completed").exclude(
+            pickup_latitude__isnull=True).exclude(
+            pickup_longitude__isnull=True)
+
+        nearby_rides = []
+        for ride in rides:
+            ride.distance_miles = miles_between(
+                user_latitude,
+                user_longitude,
+                ride.pickup_latitude,
+                ride.pickup_longitude,
+            )
+            if ride.distance_miles <= 2:
+                nearby_rides.append(ride)
+
+        return sorted(nearby_rides, key=lambda ride: ride.distance_miles)
+
+    def get_context_data(self, **kwargs):
+        """Add location status for the nearby pickup page."""
+        context = super().get_context_data(**kwargs)
+        my_profile = self.get_my_profile()
+        context["my_profile"] = my_profile
+        context["my_passenger_ride_ids"] = list(
+            RideParticipant.objects.filter(passenger=my_profile).values_list("ride_id", flat=True)
+        )
+        context["has_location"] = bool(
+            self.request.GET.get("lat", "").strip()
+            and self.request.GET.get("lng", "").strip()
         )
         return context
 
@@ -231,6 +297,7 @@ class RideDetailView(ProfileRequiredMixin, DetailView):
         )
         context["can_quit"] = (
             my_profile is not None
+            and self.object.creator != my_profile
             and (already_joined or self.object.driver == my_profile)
             and self.object.status != "completed"
         )
@@ -284,6 +351,14 @@ class RideCreateView(ProfileRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context["google_maps_api_key"] = settings.GOOGLE_MAPS_API_KEY
         return context
+
+    def get_initial(self):
+        """Prefill destination when creating from a failed ride search."""
+        initial = super().get_initial()
+        destination = self.request.GET.get("destination", "").strip()
+        if destination:
+            initial["destination"] = destination
+        return initial
 
     def form_valid(self, form):
         """Assign creator role and automatic status."""
@@ -410,6 +485,9 @@ def quit_ride(request, pk):
     if not profile:
         return redirect("campus_pickup:profile_create")
 
+    if ride.creator == profile:
+        return redirect("campus_pickup:ride_detail", pk=ride.pk)
+
     if ride.driver == profile:
         # Quitting as driver reopens the ride for another driver.
         ride.driver = None
@@ -486,22 +564,6 @@ class RideMessageCreateView(ProfileRequiredMixin, CreateView):
         form.instance.ride = self.ride
         form.instance.sender = self.get_my_profile()
         return super().form_valid(form)
-
-
-class RideMessageUpdateView(ProfileRequiredMixin, UpdateView):
-    """Update an existing ride-message record."""
-
-    model = RideMessage
-    template_name = "campus_pickup/message_form.html"
-    form_class = RideMessageForm
-
-    def get_queryset(self):
-        """Only allow senders to update their own messages."""
-        return RideMessage.objects.filter(sender=self.get_my_profile())
-
-    def get_success_url(self):
-        """Return the message detail page after a successful update."""
-        return reverse("campus_pickup:message_detail", kwargs={"pk": self.object.pk})
 
 
 class RideMessageDeleteView(ProfileRequiredMixin, DeleteView):

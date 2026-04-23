@@ -8,7 +8,6 @@ Description: Detail view template for a Ride record and related data.
 {% block content %}
 <section class="panel">
     <div class="page-title">
-        <h2>{{ ride.pickup_location }} to {{ ride.destination }}</h2>
         {% if my_profile.profile_image_url %}
         <img
             class="profile-avatar title-avatar"
@@ -16,108 +15,118 @@ Description: Detail view template for a Ride record and related data.
             alt="{{ my_profile.display_name }}"
         >
         {% endif %}
+        <h2>{{ ride.pickup_location }} to {{ ride.destination }}</h2>
     </div>
+
     <p><a href="{% url 'campus_pickup:my_rides' %}">Back to My Rides</a></p>
-    {% if ride.creator == my_profile %}
-    <p>
-        <a class="button-link" href="{% url 'campus_pickup:ride_update' ride.pk %}">Edit Ride</a>
-        <a class="button-link danger-link" href="{% url 'campus_pickup:ride_delete' ride.pk %}">Delete Ride</a>
-    </p>
-    {% endif %}
-    <p>
-        <strong>Driver:</strong>
-        {% if ride.driver %}
-        {{ ride.driver.display_name }}
-        {% else %}
-        <span class="need-driver">Needs driver</span>
-        {% endif %}
-    </p>
-    <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
-    <p><strong>Destination:</strong> {{ ride.destination }}</p>
-    {% if google_maps_api_key and ride.pickup_latitude and ride.pickup_longitude and ride.destination_latitude and ride.destination_longitude %}
-    <div id="ride-detail-map" class="ride-map detail-map"></div>
-    {% endif %}
-    <p><strong>Pickup Time:</strong> {% if ride.pickup_time %}{{ ride.pickup_time }}{% else %}Real-time{% endif %}</p>
-    <p><strong>Request Type:</strong> {{ ride.get_request_type_display }}</p>
-    <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
-    <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }} / {{ ride.seat_capacity }}  </p>
 
-    {% if can_complete %}
-    <form method="post" action="{% url 'campus_pickup:complete_ride' ride.pk %}" class="filters">
-        {% csrf_token %}
-        <button type="submit">Mark Completed</button>
-    </form>
-    {% endif %}
-
-    <h3>Join This Ride</h3>
-    {% if can_quit %}
-    <form method="post" action="{% url 'campus_pickup:quit_ride' ride.pk %}" class="filters">
-        {% csrf_token %}
-        <button type="submit">Quit Ride</button>
-    </form>
-    {% endif %}
-
-    {% if can_join %}
-    <form method="post" action="{% url 'campus_pickup:join_ride' ride.pk %}" class="filters">
-        {% csrf_token %}
-        {% if can_join_as_driver %}
-        <label for="driver_seat_capacity">Total seats:</label>
-        <input
-            id="driver_seat_capacity"
-            name="seat_capacity"
-            type="number"
-            min="{{ ride.seats_taken }}"
-            value="{{ ride.seat_capacity }}"
-        >
-        <button type="submit" name="join_role" value="driver">
-            Join as Driver
-        </button>
-        {% endif %}
-        {% if can_join_as_passenger %}
-        <button type="submit" name="join_role" value="passenger">
-            Join as Passenger
-        </button>
-        {% endif %}
-    </form>
-    {% elif already_joined %}
-    <p>You have already joined this ride.</p>
-    {% elif not user.is_authenticated %}
-    <p><a href="{% url 'campus_pickup:login' %}?next={{ request.path }}">Log in</a> to join this ride.</p>
-    {% elif not my_profile %}
-    <p><a href="{% url 'campus_pickup:profile_create' %}">Create a profile</a> before joining rides.</p>
-    {% elif ride.seats_remaining > 0 %}
-    <p>This ride is available, but your profile cannot join it right now.</p>
-    {% else %}
-    <p>This ride is full. No more passengers can join.</p>
-    {% endif %}
-</section>
-
-<section class="panel">
-    <h3>Participants</h3>
-    <p>
-        <strong>Driver:</strong>
-        {% if ride.driver %}
-        {{ ride.driver.display_name }}
-        {% else %}
-        <span class="need-driver">Needs driver</span>
-        {% endif %}
-    </p>
-
-    <h4>Passengers</h4>
-    {% if participants %}
-    <ul>
-            {% for p in participants %}
-            {% if p.passenger != ride.driver %}
-            <li>
-                {{ p.passenger.display_name }}
-                (joined {{ p.joined_at }})
-            </li>
+    <div class="ride-detail-layout">
+        <div class="ride-detail-left">
+            <h3>Ride Info</h3>
+            {% if ride.creator == my_profile %}
+            <p>
+                <a class="button-link" href="{% url 'campus_pickup:ride_update' ride.pk %}">Edit Ride</a>
+                <a class="button-link danger-link" href="{% url 'campus_pickup:ride_delete' ride.pk %}">Delete Ride</a>
+            </p>
             {% endif %}
-            {% endfor %}
-    </ul>
-    {% else %}
-    <p>No passengers have joined yet.</p>
-    {% endif %}
+            <p>
+                <strong>Driver:</strong>
+                {% if ride.driver %}
+                {{ ride.driver.display_name }}
+                {% else %}
+                <span class="need-driver">Needs driver</span>
+                {% endif %}
+            </p>
+            <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
+            <p><strong>Destination:</strong> {{ ride.destination }}</p>
+            <p><strong>Pickup Time:</strong> {% if ride.pickup_time %}{{ ride.pickup_time }}{% else %}Real-time{% endif %}</p>
+            <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
+            <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }} / {{ ride.seat_capacity }}</p>
+
+            {% if can_complete %}
+            <form method="post" action="{% url 'campus_pickup:complete_ride' ride.pk %}" class="filters">
+                {% csrf_token %}
+                <button type="submit">Mark Completed</button>
+            </form>
+            {% endif %}
+
+            <h3>Join This Ride</h3>
+            {% if can_quit %}
+            <form method="post" action="{% url 'campus_pickup:quit_ride' ride.pk %}" class="filters">
+                {% csrf_token %}
+                <button type="submit">Quit Ride</button>
+            </form>
+            {% endif %}
+
+            {% if can_join %}
+            <form method="post" action="{% url 'campus_pickup:join_ride' ride.pk %}" class="filters">
+                {% csrf_token %}
+                {% if can_join_as_driver %}
+                <label for="driver_seat_capacity">Total seats:</label>
+                <input
+                    id="driver_seat_capacity"
+                    name="seat_capacity"
+                    type="number"
+                    min="{{ ride.seats_taken }}"
+                    value="{{ ride.seat_capacity }}"
+                >
+                <button type="submit" name="join_role" value="driver">
+                    Join as Driver
+                </button>
+                {% endif %}
+                {% if can_join_as_passenger %}
+                <button type="submit" name="join_role" value="passenger">
+                    Join as Passenger
+                </button>
+                {% endif %}
+            </form>
+            {% elif already_joined %}
+            <p>You have already joined this ride.</p>
+            {% elif not user.is_authenticated %}
+            <p><a href="{% url 'campus_pickup:login' %}?next={{ request.path }}">Log in</a> to join this ride.</p>
+            {% elif not my_profile %}
+            <p><a href="{% url 'campus_pickup:profile_create' %}">Create a profile</a> before joining rides.</p>
+            {% elif ride.seats_remaining > 0 %}
+            <p>Your profile cannot join it right now.</p>
+            {% else %}
+            <p>This ride is full. No more passengers can join.</p>
+            {% endif %}
+
+            <h3>Participants</h3>
+            <p>
+                <strong>Driver:</strong>
+                {% if ride.driver %}
+                {{ ride.driver.display_name }}
+                {% else %}
+                <span class="need-driver">Needs driver</span>
+                {% endif %}
+            </p>
+
+            <h4>Passengers</h4>
+            {% if participants %}
+            <ul>
+                {% for p in participants %}
+                {% if p.passenger != ride.driver %}
+                <li>
+                    {{ p.passenger.display_name }}
+                    (joined {{ p.joined_at }})
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No passengers have joined yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="ride-detail-map-area">
+            {% if google_maps_api_key and ride.pickup_latitude and ride.pickup_longitude and ride.destination_latitude and ride.destination_longitude %}
+            <div id="ride-detail-map" class="ride-map detail-map"></div>
+            {% else %}
+            <p>No map location saved for this ride.</p>
+            {% endif %}
+        </div>
+    </div>
 </section>
 
 <section class="panel">
@@ -128,13 +137,26 @@ Description: Detail view template for a Ride record and related data.
             Add Message
         </a>
     </p>
-    <ul>
+    <ul class="message-list">
         {% for m in messages %}
-        <li>
-            <a href="{% url 'campus_pickup:message_detail' m.pk %}">
-                {{ m.sender.display_name }}
-            </a>
-            : {{ m.text }} ({{ m.timestamp }})
+        <li class="message-row">
+            {% if m.sender.profile_image_url %}
+            <img
+                class="profile-avatar message-avatar"
+                src="{{ m.sender.profile_image_url.url }}"
+                alt="{{ m.sender.display_name }}"
+            >
+            {% else %}
+            <span class="message-avatar message-avatar-fallback">
+                {{ m.sender.display_name|first }}
+            </span>
+            {% endif %}
+            <span>
+                <a href="{% url 'campus_pickup:message_detail' m.pk %}">
+                    {{ m.sender.display_name }}
+                </a>
+                : {{ m.text }} ({{ m.timestamp }})
+            </span>
         </li>
         {% empty %}
         <li>No messages.</li>

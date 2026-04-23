@@ -1,13 +1,22 @@
 <!--
 File: campus_pickup/templates/campus_pickup/login.html
 Author: Louis Szeto (szetol@bu.edu), 4/21/2026
-Description: Login page for campus pickup using Django auth LoginView.
+Description: Login page for Hitchhike using Django auth LoginView.
 -->
 {% extends "campus_pickup/base.html" %}
 
 {% block content %}
 <section class="panel">
-    <h2>Login to Campus Pickup</h2>
+    <h2>Login to Hitchhike</h2>
+    <p>
+        Hitchhike helps people find rides, request rides, and share trip details with others.
+        You can use it for a quick local pickup or a longer ride to another place.
+    </p>
+    <p>
+        After logging in, search where you want to go, join an available ride, or create a new
+        ride request if no one is going there yet.
+        You can also use Nearby Pickups to find rides starting close to your current location.
+    </p>
     <form method="post" class="form-grid">
         {% csrf_token %}
         {{ form.as_p }}

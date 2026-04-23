@@ -95,7 +95,7 @@ class RideForm(forms.ModelForm):
         if cleaned_data.get("ride_role") == "requester":
             cleaned_data["seat_capacity"] = 4
 
-        # Hidden coordinate fields come from the Google Maps search buttons.
+        # Coordinate fields come from the Google Maps search buttons.
         coordinate_fields = [
             "pickup_latitude",
             "pickup_longitude",

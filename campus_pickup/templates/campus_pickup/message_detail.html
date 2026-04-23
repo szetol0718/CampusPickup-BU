@@ -9,7 +9,6 @@ Description: Detail view template for a RideMessage record.
 <section class="panel">
     <h2>Ride Message #{{ message.id }}</h2>
     <p>
-        <a class="button-link" href="{% url 'campus_pickup:message_update' message.pk %}">Edit Message</a>
         <a class="button-link danger-link" href="{% url 'campus_pickup:message_delete' message.pk %}">Delete Message</a>
     </p>
     <p>
@@ -18,7 +17,20 @@ Description: Detail view template for a RideMessage record.
             Ride #{{ message.ride.pk }}
         </a>
     </p>
-    <p><strong>Sender:</strong> {{ message.sender.display_name }}</p>
+    <p class="message-row">
+        {% if message.sender.profile_image_url %}
+        <img
+            class="profile-avatar message-avatar"
+            src="{{ message.sender.profile_image_url.url }}"
+            alt="{{ message.sender.display_name }}"
+        >
+        {% else %}
+        <span class="message-avatar message-avatar-fallback">
+            {{ message.sender.display_name|first }}
+        </span>
+        {% endif %}
+        <span><strong>Sender:</strong> {{ message.sender.display_name }}</span>
+    </p>
     <p><strong>Message Text:</strong> {{ message.text }}</p>
     <p><strong>Timestamp:</strong> {{ message.timestamp }}</p>
 </section>

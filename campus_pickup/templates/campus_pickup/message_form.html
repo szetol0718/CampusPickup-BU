@@ -1,22 +1,18 @@
 <!--
 File: campus_pickup/templates/campus_pickup/message_form.html
 Author: Louis Szeto (szetol@bu.edu), 4/21/2026
-Description: Form template for creating and updating a ride message.
+Description: Form template for creating a ride message.
 -->
 {% extends "campus_pickup/base.html" %}
 
 {% block content %}
 <section class="panel">
-    {% if object %}
-    <h2>Edit Ride Message #{{ object.id }}</h2>
-    {% else %}
     <h2>Add Message</h2>
     {% if ride %}
     <p>
         <strong>Ride:</strong>
         {{ ride.pickup_location }} to {{ ride.destination }}
     </p>
-    {% endif %}
     {% endif %}
 
     <form method="post" class="form-grid">

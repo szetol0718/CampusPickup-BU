@@ -1,7 +1,7 @@
 <!--
 File: campus_pickup/templates/campus_pickup/base.html
 Author: Louis Szeto (szetol@bu.edu), 4/21/2026
-Description: Shared base template and navigation for campus pickup views.
+Description: Shared base template and navigation for Hitchhike views.
 -->
 {% load static %}
 <!DOCTYPE html>
@@ -9,15 +9,16 @@ Description: Shared base template and navigation for campus pickup views.
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Pickup</title>
-    <link rel="stylesheet" href="{% static 'styles/campus_pickup.css' %}?v=7">
+    <title>Hitchhike</title>
+    <link rel="stylesheet" href="{% static 'styles/campus_pickup.css' %}?v=13">
 </head>
 <body>
     <header>
-        <h1>Campus Pickup</h1>
+        <h1>Hitchhike</h1>
         <nav>
             {% if user.is_authenticated %}
             <a href="{% url 'campus_pickup:ride_list' %}">Find Rides</a>
+            <a href="{% url 'campus_pickup:nearby_rides' %}">Nearby Pickups</a>
             <a href="{% url 'campus_pickup:my_rides' %}">My Rides</a>
             <span class="nav-status">Logged in as {{ user.username }}</span>
             <form method="post" action="{% url 'campus_pickup:logout' %}" class="nav-form">

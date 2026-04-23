@@ -32,6 +32,7 @@ urlpatterns = [
     path("profiles/<int:pk>/update/", views.ProfileUpdateView.as_view(), name="profile_update"),
     path("profiles/<int:pk>/delete/", views.ProfileDeleteView.as_view(), name="profile_delete"),
     path("rides/", views.RideListView.as_view(), name="ride_list"),
+    path("rides/nearby/", views.NearbyRideListView.as_view(), name="nearby_rides"),
     path("rides/my/", views.MyRideListView.as_view(), name="my_rides"),
     path("rides/create/", views.RideCreateView.as_view(), name="ride_create"),
     path("rides/<int:pk>/", views.RideDetailView.as_view(), name="ride_detail"),
@@ -46,6 +47,5 @@ urlpatterns = [
         name="ride_message_create",
     ),
     path("messages/<int:pk>/", views.RideMessageDetailView.as_view(), name="message_detail"),
-    path("messages/<int:pk>/update/", views.RideMessageUpdateView.as_view(), name="message_update"),
     path("messages/<int:pk>/delete/", views.RideMessageDeleteView.as_view(), name="message_delete"),
 ]

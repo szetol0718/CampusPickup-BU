@@ -1,17 +1,16 @@
 <!--
 File: campus_pickup/templates/campus_pickup/logged_out.html
 Author: Louis Szeto (szetol@bu.edu), 4/21/2026
-Description: Logout confirmation page for campus pickup.
+Description: Logout confirmation page for Hitchhike.
 -->
 {% extends "campus_pickup/base.html" %}
 
 {% block content %}
 <section class="panel">
     <h2>Logged Out</h2>
-    <p>You have been logged out.</p>
+    <p>You have been logged out. Thank you for using Hitchhike!</p>
     <p>
-        <a href="{% url 'campus_pickup:login' %}">Log in again</a> |
-        <a href="{% url 'campus_pickup:ride_list' %}">Back to rides</a>
+        <a href="{% url 'campus_pickup:login' %}">Log in again</a>
     </p>
 </section>
 {% endblock %}

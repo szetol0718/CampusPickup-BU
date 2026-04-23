@@ -1,14 +1,14 @@
 <!--
-File: campus_pickup/templates/campus_pickup/ride_list.html
-Author: Louis Szeto (szetol@bu.edu), 4/21/2026
-Description: List view template for Ride records with basic filtering.
+File: campus_pickup/templates/campus_pickup/nearby_ride_list.html
+Author: Louis Szeto (szetol@bu.edu), 4/22/2026
+Description: Nearby pickup rides page.
 -->
 {% extends "campus_pickup/base.html" %}
 
 {% block content %}
 <section class="panel">
     <div class="page-title">
-        <h2>Find Rides</h2>
+        <h2>Nearby Pickups</h2>
         {% if my_profile.profile_image_url %}
         <img
             class="profile-avatar title-avatar"
@@ -17,29 +17,20 @@ Description: List view template for Ride records with basic filtering.
         >
         {% endif %}
     </div>
-    <p>
-        <a class="button-link" href="{% url 'campus_pickup:ride_create' %}">Create Ride</a>
-        <a class="button-link" href="{% url 'campus_pickup:nearby_rides' %}">Nearby Pickups</a>
-        <a class="button-link" href="{% url 'campus_pickup:my_rides' %}">My Rides</a>
-    </p>
 
-    <form method="get" class="filters">
-        <label for="q">Search:</label>
-        <span class="search-box">
-            <input
-                id="q"
-                name="q"
-                type="text"
-                value="{{ current_query }}"
-                placeholder="Where to?"
-            >
-            <button type="submit" aria-label="Search rides">&#128269;</button>
-        </span>
-    </form>
+    <p>
+        Find rides with pickup locations within 2 miles of you. Your browser will ask for
+        permission to use your current location.
+    </p>
+    <p>
+        <button type="button" id="use-current-location">Use My Current Location</button>
+        <span id="location-status" class="help-text"></span>
+    </p>
 
     <table>
         <thead>
             <tr>
+                <th>Distance</th>
                 <th>Pickup</th>
                 <th>Destination</th>
                 <th>Time</th>
@@ -52,6 +43,7 @@ Description: List view template for Ride records with basic filtering.
         <tbody>
             {% for r in rides %}
             <tr>
+                <td>{{ r.distance_miles|floatformat:1 }} mi</td>
                 <td>{{ r.pickup_location }}</td>
                 <td>{{ r.destination }}</td>
                 <td>{% if r.pickup_time %}{{ r.pickup_time }}{% else %}Real-time{% endif %}</td>
@@ -69,12 +61,11 @@ Description: List view template for Ride records with basic filtering.
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7">
-                    No rides found.
-                    {% if current_query %}
-                    <a href="{% url 'campus_pickup:ride_create' %}?destination={{ current_query|urlencode }}">
-                        Create a ride to "{{ current_query }}"
-                    </a>.
+                <td colspan="8">
+                    {% if has_location %}
+                    No pickups found within 2 miles.
+                    {% else %}
+                    Use your current location to see nearby pickup rides.
                     {% endif %}
                 </td>
             </tr>
@@ -82,4 +73,26 @@ Description: List view template for Ride records with basic filtering.
         </tbody>
     </table>
 </section>
+
+<script>
+    const locationButton = document.getElementById("use-current-location");
+    const locationStatus = document.getElementById("location-status");
+
+    locationButton.addEventListener("click", function() {
+        if (!navigator.geolocation) {
+            locationStatus.textContent = "Your browser does not support location.";
+            return;
+        }
+
+        locationStatus.textContent = "Finding your location...";
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const url = "{% url 'campus_pickup:nearby_rides' %}"
+                + "?lat=" + encodeURIComponent(position.coords.latitude)
+                + "&lng=" + encodeURIComponent(position.coords.longitude);
+            window.location.href = url;
+        }, function() {
+            locationStatus.textContent = "Could not get your location.";
+        });
+    });
+</script>
 {% endblock %}
