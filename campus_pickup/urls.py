@@ -19,6 +19,7 @@ urlpatterns = [
         auth_views.LoginView.as_view(
             template_name="campus_pickup/login.html",
             redirect_authenticated_user=True,
+            next_page="campus_pickup:ride_list",
         ),
         name="login",),
     path("logout/",

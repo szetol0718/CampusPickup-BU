@@ -20,7 +20,9 @@ Description: Login page for Hitchhike using Django auth LoginView.
     <form method="post" class="form-grid">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="hidden" name="next" value="{{ next|default:'/campus_pickup/' }}">
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
         <button type="submit">Login</button>
     </form>
     <p>
