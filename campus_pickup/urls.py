@@ -19,7 +19,7 @@ urlpatterns = [
         auth_views.LoginView.as_view(
             template_name="campus_pickup/login.html",
             redirect_authenticated_user=True,
-            next_page="campus_pickup:ride_list",
+            next_page="campus_pickup:accepted_ride_list",
         ),
         name="login",),
     path("logout/",
@@ -33,6 +33,7 @@ urlpatterns = [
     path("profiles/<int:pk>/update/", views.ProfileUpdateView.as_view(), name="profile_update"),
     path("profiles/<int:pk>/delete/", views.ProfileDeleteView.as_view(), name="profile_delete"),
     path("rides/", views.RideListView.as_view(), name="ride_list"),
+    path("rides/accepted/", views.AcceptedRideListView.as_view(), name="accepted_ride_list"),
     path("rides/nearby/", views.NearbyRideListView.as_view(), name="nearby_rides"),
     path("rides/my/", views.MyRideListView.as_view(), name="my_rides"),
     path("rides/create/", views.RideCreateView.as_view(), name="ride_create"),

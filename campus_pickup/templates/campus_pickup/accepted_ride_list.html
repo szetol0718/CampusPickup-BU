@@ -1,7 +1,7 @@
 <!--
-File: campus_pickup/templates/campus_pickup/ride_list.html
-Author: Louis Szeto (szetol@bu.edu), 4/21/2026
-Description: List view template for Ride records with basic filtering.
+File: campus_pickup/templates/campus_pickup/accepted_ride_list.html
+Author: Louis Szeto (szetol@bu.edu), 4/24/2026
+Description: List view template for rides that need passengers.
 -->
 {% extends "campus_pickup/base.html" %}
 
@@ -9,7 +9,7 @@ Description: List view template for Ride records with basic filtering.
 <section class="panel">
     <div class="page-title page-title-spread">
         <div class="page-title">
-            <h2>Rides That Need Drivers</h2>
+            <h2>Rides That Need Passengers</h2>
             {% if my_profile.profile_image_url %}
             <img
                 class="profile-avatar title-avatar"
@@ -46,7 +46,6 @@ Description: List view template for Ride records with basic filtering.
                 <th>Pickup</th>
                 <th>Destination</th>
                 <th>Time</th>
-                <th>Status</th>
                 <th>Seats Left</th>
                 <th>My Role</th>
                 <th>Details</th>
@@ -58,7 +57,6 @@ Description: List view template for Ride records with basic filtering.
                 <td>{{ r.pickup_location }}</td>
                 <td>{{ r.destination }}</td>
                 <td>{% if r.pickup_time %}{{ r.pickup_time }}{% else %}Real-time{% endif %}</td>
-                <td><span class="need-driver">Needs driver</span></td>
                 <td>{{ r.seats_remaining }}</td>
                 <td>
                     {% if r.driver == my_profile %}Driver{% elif r.id in my_passenger_ride_ids %}Passenger{% else %}-{% endif %}
@@ -68,7 +66,7 @@ Description: List view template for Ride records with basic filtering.
             {% empty %}
             <tr>
                 <td colspan="7">
-                    No rides waiting for a driver right now.
+                    No rides waiting for passengers right now.
                     {% if current_query %}
                     <a href="{% url 'campus_pickup:ride_create' %}?destination={{ current_query|urlencode }}">
                         Create a ride to "{{ current_query }}"

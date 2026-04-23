@@ -165,16 +165,19 @@ class ProfileDeleteView(ProfileRequiredMixin, DeleteView):
 
 
 class RideListView(ProfileRequiredMixin, ListView):
-    """Display active rides and allow simple text search."""
+    """Display rides that still need a driver."""
 
     model = Ride
     template_name = "campus_pickup/ride_list.html"
     context_object_name = "rides"
+    ride_status = "open"
+    switch_url_name = "campus_pickup:accepted_ride_list"
+    switch_label = "Switch to Need Passengers"
 
     def get_queryset(self):
-        """Filter active rides by optional destination/location text."""
-        queryset = Ride.objects.select_related("creator", "driver").exclude(
-            status="completed"
+        """Filter rides by status and optional destination/location text."""
+        queryset = Ride.objects.select_related("creator", "driver").filter(
+            status=self.ride_status
         ).order_by("pickup_time")
         query = self.request.GET.get("q", "").strip()
 
@@ -186,7 +189,7 @@ class RideListView(ProfileRequiredMixin, ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
-        """Include current search value and current user's role data."""
+        """Include current search value, role data, and switch-button info."""
         context = super().get_context_data(**kwargs)
         context["current_query"] = self.request.GET.get("q", "").strip()
         my_profile = self.get_my_profile()
@@ -194,7 +197,18 @@ class RideListView(ProfileRequiredMixin, ListView):
         context["my_passenger_ride_ids"] = list(
             RideParticipant.objects.filter(passenger=my_profile).values_list("ride_id", flat=True)
         )
+        context["switch_url"] = reverse(self.switch_url_name)
+        context["switch_label"] = self.switch_label
         return context
+
+
+class AcceptedRideListView(RideListView):
+    """Display rides that already have a driver and need passengers."""
+
+    template_name = "campus_pickup/accepted_ride_list.html"
+    ride_status = "accepted"
+    switch_url_name = "campus_pickup:ride_list"
+    switch_label = "Switch to Need Driver"
 
 
 class NearbyRideListView(ProfileRequiredMixin, ListView):

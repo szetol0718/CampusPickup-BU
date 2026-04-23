@@ -10,14 +10,14 @@ Description: Shared base template and navigation for Hitchhike views.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hitchhike</title>
-    <link rel="stylesheet" href="{% static 'styles/campus_pickup.css' %}?v=13">
+    <link rel="stylesheet" href="{% static 'styles/campus_pickup.css' %}">
 </head>
 <body>
     <header>
         <h1>Hitchhike</h1>
         <nav>
             {% if user.is_authenticated %}
-            <a href="{% url 'campus_pickup:ride_list' %}">Find Rides</a>
+            <a href="{% url 'campus_pickup:accepted_ride_list' %}">Find Rides</a>
             <a href="{% url 'campus_pickup:nearby_rides' %}">Nearby Pickups</a>
             <a href="{% url 'campus_pickup:my_rides' %}">My Rides</a>
             <span class="nav-status">Logged in as {{ user.username }}</span>
