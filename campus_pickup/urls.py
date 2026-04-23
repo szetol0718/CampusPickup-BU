@@ -4,13 +4,17 @@
 
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
 from . import views
 
 app_name = "campus_pickup"
 
 urlpatterns = [
-    path("", views.home, name="home"),
+    path(
+        "",
+        RedirectView.as_view(pattern_name="campus_pickup:ride_list", permanent=False),
+        name="home",
+    ),
     path("login/",
         auth_views.LoginView.as_view(
             template_name="campus_pickup/login.html",
@@ -24,9 +28,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="campus_pickup/logged_out.html"),
         name="logout_confirmation",),
     path("profile/", views.MyProfileDetailView.as_view(), name="my_profile"),
-    path("profiles/", views.ProfileListView.as_view(), name="profile_list"),
     path("profiles/create/", views.ProfileCreateView.as_view(), name="profile_create"),
-    path("profiles/<int:pk>/", views.ProfileDetailView.as_view(), name="profile_detail"),
     path("profiles/<int:pk>/update/", views.ProfileUpdateView.as_view(), name="profile_update"),
     path("profiles/<int:pk>/delete/", views.ProfileDeleteView.as_view(), name="profile_delete"),
     path("rides/", views.RideListView.as_view(), name="ride_list"),
@@ -43,12 +45,6 @@ urlpatterns = [
         views.RideMessageCreateView.as_view(),
         name="ride_message_create",
     ),
-    path("participants/", views.RideParticipantListView.as_view(), name="participant_list"),
-    path("participants/<int:pk>/",
-        views.RideParticipantDetailView.as_view(),
-        name="participant_detail",),
-    path("messages/", views.RideMessageListView.as_view(), name="message_list"),
-    path("messages/create/", views.RideMessageCreateView.as_view(), name="message_create"),
     path("messages/<int:pk>/", views.RideMessageDetailView.as_view(), name="message_detail"),
     path("messages/<int:pk>/update/", views.RideMessageUpdateView.as_view(), name="message_update"),
     path("messages/<int:pk>/delete/", views.RideMessageDeleteView.as_view(), name="message_delete"),

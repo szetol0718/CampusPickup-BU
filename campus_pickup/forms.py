@@ -56,6 +56,10 @@ class RideForm(forms.ModelForm):
             "request_type",
             "pickup_location",
             "destination",
+            "pickup_latitude",
+            "pickup_longitude",
+            "destination_latitude",
+            "destination_longitude",
             "pickup_time",
             "seat_capacity",
         ]
@@ -63,7 +67,17 @@ class RideForm(forms.ModelForm):
             "seat_capacity": "Total seats, including you",
         }
         widgets = {
+            "pickup_location": forms.TextInput(
+                attrs={"placeholder": "Example: BU Student Village 2"}
+            ),
+            "destination": forms.TextInput(
+                attrs={"placeholder": "Example: Logan Airport"}
+            ),
             "seat_capacity": forms.NumberInput(attrs={"min": 1}),
+            "pickup_latitude": forms.HiddenInput(),
+            "pickup_longitude": forms.HiddenInput(),
+            "destination_latitude": forms.HiddenInput(),
+            "destination_longitude": forms.HiddenInput(),
         }
 
     def clean(self):
@@ -77,8 +91,21 @@ class RideForm(forms.ModelForm):
         elif request_type == "realtime":
             cleaned_data["pickup_time"] = None
 
+        # Ride requesters always start with the default capacity.
         if cleaned_data.get("ride_role") == "requester":
             cleaned_data["seat_capacity"] = 4
+
+        # Hidden coordinate fields come from the Google Maps search buttons.
+        coordinate_fields = [
+            "pickup_latitude",
+            "pickup_longitude",
+            "destination_latitude",
+            "destination_longitude",
+        ]
+        if any(cleaned_data.get(field) is None for field in coordinate_fields):
+            raise forms.ValidationError(
+                "Please use Find for both pickup and destination before saving."
+            )
 
         return cleaned_data
 

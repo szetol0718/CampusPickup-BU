@@ -26,16 +26,46 @@ Description: Form template for creating and updating a ride.
             {{ form.request_type }}
             {{ form.request_type.errors }}
         </p>
-        <p>
-            {{ form.pickup_location.label_tag }}
-            {{ form.pickup_location }}
-            {{ form.pickup_location.errors }}
-        </p>
-        <p>
-            {{ form.destination.label_tag }}
-            {{ form.destination }}
-            {{ form.destination.errors }}
-        </p>
+        {{ form.pickup_latitude }}
+        {{ form.pickup_longitude }}
+        {{ form.destination_latitude }}
+        {{ form.destination_longitude }}
+        {% if form.pickup_latitude.errors or form.pickup_longitude.errors or form.destination_latitude.errors or form.destination_longitude.errors %}
+        <p>{{ form.pickup_latitude.errors }} {{ form.pickup_longitude.errors }} {{ form.destination_latitude.errors }} {{ form.destination_longitude.errors }}</p>
+        {% endif %}
+
+        <div class="ride-location-layout">
+            <div class="location-fields">
+                <p class="location-field">
+                    {{ form.pickup_location.label_tag }}
+                    <span class="location-field-actions">
+                        {{ form.pickup_location }}
+                        <button type="button" id="find-pickup">Find</button>
+                    </span>
+                    {{ form.pickup_location.errors }}
+                </p>
+                <p class="location-field">
+                    {{ form.destination.label_tag }}
+                    <span class="location-field-actions">
+                        {{ form.destination }}
+                        <button type="button" id="find-destination">Find</button>
+                    </span>
+                    {{ form.destination.errors }}
+                </p>
+
+                <p class="help-text">
+                    Type each location and click Find so the map can save the pickup and destination.
+                </p>
+                <p id="map-search-status" class="help-text"></p>
+            </div>
+
+            {% if google_maps_api_key %}
+            <div id="ride-map" class="ride-map"></div>
+            {% else %}
+            <p class="help-text">Google Maps API key is missing.</p>
+            {% endif %}
+        </div>
+
         <p id="pickup-time-field">
             {{ form.pickup_time.label_tag }}
             {{ form.pickup_time }}
@@ -55,4 +85,113 @@ Description: Form template for creating and updating a ride.
         <button type="submit">Create Ride</button>
     </form>
 </section>
+
+{% if google_maps_api_key %}
+<script>
+    function initRideMap() {
+        const defaultCenter = { lat: 42.3505, lng: -71.1054 };
+        const map = new google.maps.Map(document.getElementById("ride-map"), {
+            center: defaultCenter,
+            zoom: 13,
+        });
+        const geocoder = new google.maps.Geocoder();
+        const pickupLat = document.getElementById("id_pickup_latitude");
+        const pickupLng = document.getElementById("id_pickup_longitude");
+        const destLat = document.getElementById("id_destination_latitude");
+        const destLng = document.getElementById("id_destination_longitude");
+        const pickupLocation = document.getElementById("id_pickup_location");
+        const destinationLocation = document.getElementById("id_destination");
+        const mapSearchStatus = document.getElementById("map-search-status");
+        let pickupMarker = null;
+        let destinationMarker = null;
+
+        function setMarker(kind, latlng) {
+            if (kind === "pickup") {
+                pickupLat.value = latlng.lat().toFixed(6);
+                pickupLng.value = latlng.lng().toFixed(6);
+                if (pickupMarker) {
+                    pickupMarker.setPosition(latlng);
+                } else {
+                    pickupMarker = new google.maps.Marker({
+                        map: map,
+                        position: latlng,
+                        label: "P",
+                        title: "Pickup",
+                    });
+                }
+            } else {
+                destLat.value = latlng.lat().toFixed(6);
+                destLng.value = latlng.lng().toFixed(6);
+                if (destinationMarker) {
+                    destinationMarker.setPosition(latlng);
+                } else {
+                    destinationMarker = new google.maps.Marker({
+                        map: map,
+                        position: latlng,
+                        label: "D",
+                        title: "Destination",
+                    });
+                }
+            }
+        }
+
+        function restoreMarker(kind, latInput, lngInput) {
+            if (latInput.value && lngInput.value) {
+                const latlng = new google.maps.LatLng(
+                    parseFloat(latInput.value),
+                    parseFloat(lngInput.value)
+                );
+                setMarker(kind, latlng);
+            }
+        }
+
+        function fitMapToMarkers() {
+            if (pickupMarker && destinationMarker) {
+                const bounds = new google.maps.LatLngBounds();
+                bounds.extend(pickupMarker.getPosition());
+                bounds.extend(destinationMarker.getPosition());
+                map.fitBounds(bounds);
+            }
+        }
+
+        function findLocation(kind, textInput) {
+            const query = textInput.value.trim();
+            if (!query) {
+                mapSearchStatus.textContent = "Enter a location first.";
+                return;
+            }
+
+            mapSearchStatus.textContent = "Searching map...";
+            geocoder.geocode({ address: query }, function(results, status) {
+                if (status !== "OK" || !results.length) {
+                    mapSearchStatus.textContent = "No map result found. Try a more specific location.";
+                    return;
+                }
+
+                const latlng = results[0].geometry.location;
+                setMarker(kind, latlng);
+                map.setCenter(latlng);
+                map.setZoom(15);
+                fitMapToMarkers();
+                mapSearchStatus.textContent = "Location found on map.";
+            });
+        }
+
+        restoreMarker("pickup", pickupLat, pickupLng);
+        restoreMarker("destination", destLat, destLng);
+        fitMapToMarkers();
+
+        document.getElementById("find-pickup").addEventListener("click", function() {
+            findLocation("pickup", pickupLocation);
+        });
+
+        document.getElementById("find-destination").addEventListener("click", function() {
+            findLocation("destination", destinationLocation);
+        });
+    }
+
+    window.initRideMap = initRideMap;
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initRideMap" async defer></script>
+{% endif %}
 {% endblock %}

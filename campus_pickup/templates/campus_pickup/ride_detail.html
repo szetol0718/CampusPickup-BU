@@ -34,6 +34,9 @@ Description: Detail view template for a Ride record and related data.
     </p>
     <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
     <p><strong>Destination:</strong> {{ ride.destination }}</p>
+    {% if google_maps_api_key and ride.pickup_latitude and ride.pickup_longitude and ride.destination_latitude and ride.destination_longitude %}
+    <div id="ride-detail-map" class="ride-map detail-map"></div>
+    {% endif %}
     <p><strong>Pickup Time:</strong> {% if ride.pickup_time %}{{ ride.pickup_time }}{% else %}Real-time{% endif %}</p>
     <p><strong>Request Type:</strong> {{ ride.get_request_type_display }}</p>
     <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
@@ -106,9 +109,7 @@ Description: Detail view template for a Ride record and related data.
             {% for p in participants %}
             {% if p.passenger != ride.driver %}
             <li>
-                <a href="{% url 'campus_pickup:participant_detail' p.pk %}">
-                    {{ p.passenger.display_name }}
-                </a>
+                {{ p.passenger.display_name }}
                 (joined {{ p.joined_at }})
             </li>
             {% endif %}
@@ -143,4 +144,51 @@ Description: Detail view template for a Ride record and related data.
     <p>Join this ride to see and send messages.</p>
     {% endif %}
 </section>
+
+{% if google_maps_api_key and ride.pickup_latitude and ride.pickup_longitude and ride.destination_latitude and ride.destination_longitude %}
+<script>
+    function initRideDetailMap() {
+        const pickup = {
+            lat: {{ ride.pickup_latitude }},
+            lng: {{ ride.pickup_longitude }}
+        };
+        const destination = {
+            lat: {{ ride.destination_latitude }},
+            lng: {{ ride.destination_longitude }}
+        };
+        const detailMap = new google.maps.Map(document.getElementById("ride-detail-map"), {
+            center: pickup,
+            zoom: 13,
+        });
+        const pickupMarker = new google.maps.Marker({
+            map: detailMap,
+            position: pickup,
+            label: "P",
+            title: "Pickup",
+        });
+        const destinationMarker = new google.maps.Marker({
+            map: detailMap,
+            position: destination,
+            label: "D",
+            title: "Destination",
+        });
+        const routeLine = new google.maps.Polyline({
+            path: [pickup, destination],
+            geodesic: true,
+            strokeColor: "#0e7c86",
+            strokeOpacity: 1,
+            strokeWeight: 4,
+        });
+        const bounds = new google.maps.LatLngBounds();
+
+        routeLine.setMap(detailMap);
+        bounds.extend(pickupMarker.getPosition());
+        bounds.extend(destinationMarker.getPosition());
+        detailMap.fitBounds(bounds);
+    }
+
+    window.initRideDetailMap = initRideDetailMap;
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initRideDetailMap" async defer></script>
+{% endif %}
 {% endblock %}

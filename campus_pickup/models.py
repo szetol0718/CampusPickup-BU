@@ -56,6 +56,11 @@ class Ride(models.Model):
 
     pickup_location = models.TextField(blank=False)
     destination = models.TextField(blank=False)
+    # Coordinates are filled by the Google Maps search buttons on the ride form.
+    pickup_latitude = models.FloatField(null=True, blank=True)
+    pickup_longitude = models.FloatField(null=True, blank=True)
+    destination_latitude = models.FloatField(null=True, blank=True)
+    destination_longitude = models.FloatField(null=True, blank=True)
     pickup_time = models.DateTimeField(null=True, blank=True)
     request_type = models.CharField(max_length=20, choices=REQUEST_TYPES)
     status = models.CharField(
@@ -75,6 +80,7 @@ class Ride(models.Model):
 
     def seats_taken(self):
         """Return occupied seats from passengers plus driver."""
+        # A creator only counts if they are saved as driver or passenger.
         passenger_ids = set(
             RideParticipant.objects.filter(ride=self).values_list("passenger_id", flat=True)
         )

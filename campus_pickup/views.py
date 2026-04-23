@@ -2,12 +2,13 @@
 # Author: Louis Szeto (szetol@bu.edu), 4/21/2026
 # Description: List and detail interfaces for campus pickup models.
 
+from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -17,6 +18,7 @@ from .models import Profile, Ride, RideMessage, RideParticipant
 
 def update_ride_status(ride):
     """Update ride status from current driver and seat usage."""
+    # Status is derived from seats/driver, not edited directly by users.
     if ride.is_full():
         ride.status = "full"
     elif ride.driver:
@@ -51,33 +53,6 @@ class ProfileRequiredMixin(LoginRequiredMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-@login_required(login_url=reverse_lazy("campus_pickup:login"))
-def home(request):
-    """Render the logged-in user's campus pickup dashboard."""
-    profile = Profile.objects.filter(user=request.user).first()
-    if not profile:
-        return redirect("campus_pickup:profile_create")
-
-    my_rides = Ride.objects.filter(
-        Q(creator=profile) | Q(driver=profile) | Q(rideparticipant__passenger=profile)
-    ).distinct().order_by("pickup_time")
-
-    context = {
-        "profile": profile,
-        "created_rides": Ride.objects.filter(creator=profile).order_by("pickup_time"),
-        "joined_rides": Ride.objects.filter(rideparticipant__passenger=profile).order_by(
-            "pickup_time"
-        ),
-        "driving_rides": Ride.objects.filter(driver=profile).order_by("pickup_time"),
-        "my_rides": my_rides,
-        "my_passenger_ride_ids": list(
-            RideParticipant.objects.filter(passenger=profile).values_list("ride_id", flat=True)
-        ),
-        "unread_message_count": RideMessage.objects.filter(ride__in=my_rides).count(),
-    }
-    return render(request, "campus_pickup/home.html", context)
-
-
 class MyProfileDetailView(ProfileRequiredMixin, DetailView):
     """Display the logged-in user's own profile."""
 
@@ -88,26 +63,6 @@ class MyProfileDetailView(ProfileRequiredMixin, DetailView):
     def get_object(self):
         """Return the Profile for the current user."""
         return self.get_my_profile()
-
-
-class ProfileListView(ListView):
-    """Display all profile records in reverse join-date order."""
-
-    model = Profile
-    template_name = "campus_pickup/profile_list.html"
-    context_object_name = "profiles"
-
-    def get_queryset(self):
-        """Return ordered profile records."""
-        return Profile.objects.order_by("-join_date")
-
-
-class ProfileDetailView(DetailView):
-    """Display one profile record."""
-
-    model = Profile
-    template_name = "campus_pickup/profile_detail.html"
-    context_object_name = "profile"
 
 
 class ProfileCreateView(CreateView):
@@ -122,7 +77,7 @@ class ProfileCreateView(CreateView):
         if request.user.is_authenticated:
             profile = Profile.objects.filter(user=request.user).first()
             if profile:
-                return redirect("campus_pickup:profile_detail", pk=profile.pk)
+                return redirect("campus_pickup:my_profile")
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -159,8 +114,8 @@ class ProfileCreateView(CreateView):
         )
 
     def get_success_url(self):
-        """Return the dashboard after profile creation."""
-        return reverse("campus_pickup:home")
+        """Return the ride list after profile creation."""
+        return reverse("campus_pickup:ride_list")
 
 
 class ProfileUpdateView(ProfileRequiredMixin, UpdateView):
@@ -176,7 +131,7 @@ class ProfileUpdateView(ProfileRequiredMixin, UpdateView):
 
     def get_success_url(self):
         """Return the profile detail page after a successful update."""
-        return reverse("campus_pickup:profile_detail", kwargs={"pk": self.object.pk})
+        return reverse("campus_pickup:my_profile")
 
 
 class ProfileDeleteView(ProfileRequiredMixin, DeleteView):
@@ -184,7 +139,7 @@ class ProfileDeleteView(ProfileRequiredMixin, DeleteView):
 
     model = Profile
     template_name = "campus_pickup/profile_confirm_delete.html"
-    success_url = reverse_lazy("campus_pickup:profile_list")
+    success_url = reverse_lazy("campus_pickup:profile_create")
 
     def get_queryset(self):
         """Only allow users to delete their own profile."""
@@ -245,6 +200,7 @@ class RideDetailView(ProfileRequiredMixin, DetailView):
         context["messages"] = RideMessage.objects.filter(ride=self.object).select_related(
             "sender"
         ).order_by("-timestamp")
+        context["google_maps_api_key"] = settings.GOOGLE_MAPS_API_KEY
         my_profile = None
         already_joined = False
         if self.request.user.is_authenticated:
@@ -323,6 +279,12 @@ class RideCreateView(ProfileRequiredMixin, CreateView):
     form_class = RideForm
     success_url = reverse_lazy("campus_pickup:ride_list")
 
+    def get_context_data(self, **kwargs):
+        """Add the Google Maps key for the location search."""
+        context = super().get_context_data(**kwargs)
+        context["google_maps_api_key"] = settings.GOOGLE_MAPS_API_KEY
+        return context
+
     def form_valid(self, form):
         """Assign creator role and automatic status."""
         profile = self.get_my_profile()
@@ -332,6 +294,7 @@ class RideCreateView(ProfileRequiredMixin, CreateView):
 
         response = super().form_valid(form)
 
+        # If the creator needs a ride, save them as a passenger.
         if form.cleaned_data["ride_role"] == "requester":
             RideParticipant.objects.get_or_create(ride=self.object, passenger=profile)
 
@@ -346,6 +309,12 @@ class RideUpdateView(ProfileRequiredMixin, UpdateView):
     model = Ride
     template_name = "campus_pickup/ride_form.html"
     form_class = RideForm
+
+    def get_context_data(self, **kwargs):
+        """Add the Google Maps key for the location search."""
+        context = super().get_context_data(**kwargs)
+        context["google_maps_api_key"] = settings.GOOGLE_MAPS_API_KEY
+        return context
 
     def get_initial(self):
         """Prefill role choice from the current ride driver."""
@@ -367,6 +336,7 @@ class RideUpdateView(ProfileRequiredMixin, UpdateView):
 
         response = super().form_valid(form)
 
+        # Keep the creator in exactly one ride role after editing.
         if form.cleaned_data["ride_role"] == "driver":
             RideParticipant.objects.filter(ride=self.object, passenger=profile).delete()
         else:
@@ -410,6 +380,7 @@ def join_ride(request, pk):
         seat_capacity = request.POST.get("seat_capacity")
         if seat_capacity:
             try:
+                # New drivers can choose capacity, but not below occupied seats.
                 ride.seat_capacity = max(int(seat_capacity), ride.seats_taken() + 1)
             except ValueError:
                 pass
@@ -419,6 +390,7 @@ def join_ride(request, pk):
         join_role == "passenger"
         and passenger != ride.driver
         and not ride.is_full()
+        # If no driver exists, keep at least one seat open for a driver.
         and (ride.driver is not None or ride.seats_remaining() > 1)
     ):
         RideParticipant.objects.get_or_create(ride=ride, passenger=passenger)
@@ -439,9 +411,11 @@ def quit_ride(request, pk):
         return redirect("campus_pickup:profile_create")
 
     if ride.driver == profile:
+        # Quitting as driver reopens the ride for another driver.
         ride.driver = None
         ride.save()
 
+    # Quitting as passenger removes the participant row.
     RideParticipant.objects.filter(ride=ride, passenger=profile).delete()
     update_ride_status(ride)
 
@@ -460,42 +434,11 @@ def complete_ride(request, pk):
         return redirect("campus_pickup:profile_create")
 
     if ride.driver == profile:
+        # Completed rides stay visible in My Rides but leave Find Rides.
         ride.status = "completed"
         ride.save()
 
     return redirect("campus_pickup:ride_detail", pk=ride.pk)
-
-
-class RideParticipantListView(ListView):
-    """Display ride-participant records."""
-
-    model = RideParticipant
-    template_name = "campus_pickup/participant_list.html"
-    context_object_name = "participants"
-
-    def get_queryset(self):
-        """Return participant records with related ride and passenger."""
-        return RideParticipant.objects.select_related("ride", "passenger").order_by("-joined_at")
-
-
-class RideParticipantDetailView(DetailView):
-    """Display one ride-participant record."""
-
-    model = RideParticipant
-    template_name = "campus_pickup/participant_detail.html"
-    context_object_name = "participant"
-
-
-class RideMessageListView(ListView):
-    """Display ride-message records."""
-
-    model = RideMessage
-    template_name = "campus_pickup/message_list.html"
-    context_object_name = "messages"
-
-    def get_queryset(self):
-        """Return message records with related ride and sender."""
-        return RideMessage.objects.select_related("ride", "sender").order_by("-timestamp")
 
 
 class RideMessageDetailView(ProfileRequiredMixin, DetailView):
@@ -518,7 +461,7 @@ class RideMessageCreateView(ProfileRequiredMixin, CreateView):
     form_class = RideMessageForm
 
     def dispatch(self, request, *args, **kwargs):
-        """Require a ride from the URL or query string before creating a message."""
+        """Require a ride from the URL before creating a message."""
         self.ride = self.get_ride()
         if not self.ride:
             return redirect("campus_pickup:my_rides")
@@ -526,10 +469,7 @@ class RideMessageCreateView(ProfileRequiredMixin, CreateView):
 
     def get_ride(self):
         """Return the related ride if the user is allowed to message it."""
-        ride_id = self.kwargs.get("pk") or self.request.GET.get("ride")
-        if not ride_id:
-            return None
-        return self.get_my_ride_queryset().filter(pk=ride_id).first()
+        return self.get_my_ride_queryset().filter(pk=self.kwargs.get("pk")).first()
 
     def get_context_data(self, **kwargs):
         """Add the related ride to the message form page."""

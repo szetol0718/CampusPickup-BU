@@ -10,15 +10,13 @@ Description: Shared base template and navigation for campus pickup views.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campus Pickup</title>
-    <link rel="stylesheet" href="{% static 'styles/campus_pickup.css' %}?v=5">
+    <link rel="stylesheet" href="{% static 'styles/campus_pickup.css' %}?v=7">
 </head>
 <body>
     <header>
         <h1>Campus Pickup</h1>
         <nav>
             {% if user.is_authenticated %}
-            <a href="{% url 'campus_pickup:home' %}">Home</a>
-            <a href="{% url 'campus_pickup:my_profile' %}">My Profile</a>
             <a href="{% url 'campus_pickup:ride_list' %}">Find Rides</a>
             <a href="{% url 'campus_pickup:my_rides' %}">My Rides</a>
             <span class="nav-status">Logged in as {{ user.username }}</span>
@@ -26,6 +24,7 @@ Description: Shared base template and navigation for campus pickup views.
                 {% csrf_token %}
                 <button type="submit">Logout</button>
             </form>
+            <a href="{% url 'campus_pickup:my_profile' %}">My Profile</a>
             {% else %}
             <a href="{% url 'campus_pickup:login' %}">Login</a>
             <a href="{% url 'campus_pickup:profile_create' %}">Create Account</a>
