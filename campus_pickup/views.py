@@ -199,6 +199,19 @@ class RideListView(ProfileRequiredMixin, ListView):
         )
         context["switch_url"] = reverse(self.switch_url_name)
         context["switch_label"] = self.switch_label
+        context["google_maps_api_key"] = settings.GOOGLE_MAPS_API_KEY
+        context["map_rides"] = [
+            {
+                "id": ride.pk,
+                "pickup_location": ride.pickup_location,
+                "destination": ride.destination,
+                "pickup_latitude": ride.pickup_latitude,
+                "pickup_longitude": ride.pickup_longitude,
+                "detail_url": reverse("campus_pickup:ride_detail", kwargs={"pk": ride.pk}),
+            }
+            for ride in context["rides"]
+            if ride.pickup_latitude is not None and ride.pickup_longitude is not None
+        ]
         return context
 
 

@@ -20,12 +20,6 @@ Description: List view template for Ride records with basic filtering.
         </div>
         <a class="button-link" href="{{ switch_url }}{% if current_query %}?q={{ current_query|urlencode }}{% endif %}">{{ switch_label }}</a>
     </div>
-    <p>
-        <a class="button-link" href="{% url 'campus_pickup:ride_create' %}">Create Ride</a>
-        <a class="button-link" href="{% url 'campus_pickup:nearby_rides' %}">Nearby Pickups</a>
-        <a class="button-link" href="{% url 'campus_pickup:my_rides' %}">My Rides</a>
-    </p>
-
     <form method="get" class="filters">
         <label for="q">Search:</label>
         <span class="search-box">
@@ -39,6 +33,22 @@ Description: List view template for Ride records with basic filtering.
             <button type="submit" aria-label="Search rides">&#128269;</button>
         </span>
     </form>
+
+    <div class="ride-list-map-card">
+        <div class="ride-list-map-header">
+            <h3>Pickup Map</h3>
+            <button type="button" id="center-current-location">Center on My Location</button>
+        </div>
+        <p id="ride-list-map-status" class="help-text">
+            Use your current location to center the map and compare nearby pickup spots.
+        </p>
+        {% if google_maps_api_key %}
+        <div id="ride-list-map" class="ride-map list-map"></div>
+        {{ map_rides|json_script:"ride-map-data" }}
+        {% else %}
+        <p class="help-text">Google Maps API key is missing.</p>
+        {% endif %}
+    </div>
 
     <table>
         <thead>
@@ -80,4 +90,76 @@ Description: List view template for Ride records with basic filtering.
         </tbody>
     </table>
 </section>
+
+{% if google_maps_api_key %}
+<script>
+    function initRideListMap() {
+        const defaultCenter = { lat: 42.3505, lng: -71.1054 };
+        const mapStatus = document.getElementById("ride-list-map-status");
+        const centerButton = document.getElementById("center-current-location");
+        const rideMapData = JSON.parse(document.getElementById("ride-map-data").textContent);
+        const map = new google.maps.Map(document.getElementById("ride-list-map"), {
+            center: defaultCenter,
+            zoom: 13,
+        });
+        const bounds = new google.maps.LatLngBounds();
+        let hasRideMarkers = false;
+
+        rideMapData.forEach(function(ride) {
+            const markerPosition = {
+                lat: ride.pickup_latitude,
+                lng: ride.pickup_longitude,
+            };
+            const marker = new google.maps.Marker({
+                map: map,
+                position: markerPosition,
+                title: ride.pickup_location,
+            });
+            const infoWindow = new google.maps.InfoWindow({
+                content:
+                    "<strong>" + ride.pickup_location + "</strong><br>"
+                    + "Destination: " + ride.destination + "<br>"
+                    + "<a href=\"" + ride.detail_url + "\">View ride</a>",
+            });
+
+            marker.addListener("click", function() {
+                infoWindow.open({
+                    anchor: marker,
+                    map: map,
+                });
+            });
+            bounds.extend(markerPosition);
+            hasRideMarkers = true;
+        });
+
+        function centerOnCurrentLocation() {
+            if (!navigator.geolocation) {
+                mapStatus.textContent = "Your browser does not support location.";
+                return;
+            }
+
+            mapStatus.textContent = "Finding your location...";
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const currentPosition = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                };
+
+                map.setCenter(currentPosition);
+                map.setZoom(15);
+
+                mapStatus.textContent = "Map centered on your current location.";
+            }, function() {
+                mapStatus.textContent = "Could not get your location. Showing saved pickup spots only.";
+            });
+        }
+
+        centerButton.addEventListener("click", centerOnCurrentLocation);
+        centerOnCurrentLocation();
+    }
+
+    window.initRideListMap = initRideListMap;
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initRideListMap" async defer></script>
+{% endif %}
 {% endblock %}

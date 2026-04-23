@@ -197,6 +197,22 @@ textarea {
     width: 100%;
 }
 
+.list-map {
+    height: 360px;
+}
+
+.ride-list-map-card {
+    margin-bottom: 1rem;
+}
+
+.ride-list-map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
 .detail-map {
     height: 520px;
 }
