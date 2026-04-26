@@ -39,7 +39,6 @@ Description: Detail view template for a Ride record and related data.
             </p>
             <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
             <p><strong>Destination:</strong> {{ ride.destination }}</p>
-            <p><strong>Pickup Time:</strong> {% if ride.pickup_time %}{{ ride.pickup_time }}{% else %}Real-time{% endif %}</p>
             <p><strong>Status:</strong> {{ ride.get_status_display }}</p>
             <p><strong>Seats Remaining:</strong> {{ ride.seats_remaining }} / {{ ride.seat_capacity }}</p>
 

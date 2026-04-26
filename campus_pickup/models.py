@@ -27,11 +27,6 @@ class Profile(models.Model):
 class Ride(models.Model):
     """Represent a ride request or accepted ride in the system."""
 
-    REQUEST_TYPES = [
-        ("reservation", "Reservation"),
-        ("realtime", "Real-Time"),
-    ]
-
     STATUS_CHOICES = [
         ("open", "Open"),
         ("accepted", "Accepted"),
@@ -61,8 +56,6 @@ class Ride(models.Model):
     pickup_longitude = models.FloatField(null=True, blank=True)
     destination_latitude = models.FloatField(null=True, blank=True)
     destination_longitude = models.FloatField(null=True, blank=True)
-    pickup_time = models.DateTimeField(null=True, blank=True)
-    request_type = models.CharField(max_length=20, choices=REQUEST_TYPES)
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,

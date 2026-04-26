@@ -178,7 +178,7 @@ class RideListView(ProfileRequiredMixin, ListView):
         """Filter rides by status and optional destination/location text."""
         queryset = Ride.objects.select_related("creator", "driver").filter(
             status=self.ride_status
-        ).order_by("pickup_time")
+        ).order_by("-created_at")
         query = self.request.GET.get("q", "").strip()
 
         if query:
@@ -351,7 +351,7 @@ class MyRideListView(ProfileRequiredMixin, ListView):
     def get_queryset(self):
         """Return the user's related rides in pickup-time order."""
         return self.get_my_ride_queryset().select_related("creator", "driver").order_by(
-            "pickup_time"
+            "-created_at"
         )
 
     def get_context_data(self, **kwargs):

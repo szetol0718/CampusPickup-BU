@@ -36,31 +36,18 @@ class RideForm(forms.ModelForm):
         label="Create this ride as",
     )
 
-    pickup_time = forms.DateTimeField(
-        required=False,
-        label="Pickup time for reservation",
-        help_text="Leave blank for real-time rides.",
-        input_formats=["%Y-%m-%dT%H:%M"],
-        widget=forms.DateTimeInput(
-            attrs={"type": "datetime-local"},
-            format="%Y-%m-%dT%H:%M",
-        ),
-    )
-
     class Meta:
         """Metadata for RideForm fields."""
 
         model = Ride
         fields = [
             "ride_role",
-            "request_type",
             "pickup_location",
             "destination",
             "pickup_latitude",
             "pickup_longitude",
             "destination_latitude",
             "destination_longitude",
-            "pickup_time",
             "seat_capacity",
         ]
         labels = {
@@ -81,15 +68,8 @@ class RideForm(forms.ModelForm):
         }
 
     def clean(self):
-        """Require a pickup time only for reservation rides."""
+        """Validate ride fields before saving."""
         cleaned_data = super().clean()
-        request_type = cleaned_data.get("request_type")
-        pickup_time = cleaned_data.get("pickup_time")
-
-        if request_type == "reservation" and not pickup_time:
-            self.add_error("pickup_time", "Reservation rides need a pickup time.")
-        elif request_type == "realtime":
-            cleaned_data["pickup_time"] = None
 
         # Ride requesters always start with the default capacity.
         if cleaned_data.get("ride_role") == "requester":

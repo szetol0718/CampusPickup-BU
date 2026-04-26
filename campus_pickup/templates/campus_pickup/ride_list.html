@@ -55,7 +55,6 @@ Description: List view template for Ride records with basic filtering.
             <tr>
                 <th>Pickup</th>
                 <th>Destination</th>
-                <th>Time</th>
                 <th>Status</th>
                 <th>Seats Left</th>
                 <th>My Role</th>
@@ -67,13 +66,12 @@ Description: List view template for Ride records with basic filtering.
             <tr>
                 <td>{{ r.pickup_location }}</td>
                 <td>{{ r.destination }}</td>
-                <td>{% if r.pickup_time %}{{ r.pickup_time }}{% else %}Real-time{% endif %}</td>
                 <td><span class="need-driver">Needs driver</span></td>
                 <td>{{ r.seats_remaining }}</td>
                 <td>
                     {% if r.driver == my_profile %}Driver{% elif r.id in my_passenger_ride_ids %}Passenger{% else %}-{% endif %}
                 </td>
-                <td><a href="{% url 'campus_pickup:ride_detail' r.pk %}">View</a></td>
+                <td><a class="detail-link" href="{% url 'campus_pickup:ride_detail' r.pk %}">View Details</a></td>
             </tr>
             {% empty %}
             <tr>
