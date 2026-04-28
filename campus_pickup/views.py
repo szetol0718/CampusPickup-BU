@@ -64,12 +64,6 @@ class ProfileRequiredMixin(LoginRequiredMixin):
             Q(creator=profile) | Q(driver=profile) | Q(rideparticipant__passenger=profile)
         ).distinct()
 
-    def dispatch(self, request, *args, **kwargs):
-        """Send logged-in users without a profile to profile creation first."""
-        if request.user.is_authenticated and not Profile.objects.filter(user=request.user).exists():
-            return redirect("campus_pickup:profile_create")
-        return super().dispatch(request, *args, **kwargs)
-
 
 class MyProfileDetailView(ProfileRequiredMixin, DetailView):
     """Display the logged-in user's own profile."""
@@ -244,10 +238,7 @@ class NearbyRideListView(ProfileRequiredMixin, ListView):
         except ValueError:
             return []
 
-        rides = Ride.objects.select_related("creator", "driver").exclude(
-            status="completed").exclude(
-            pickup_latitude__isnull=True).exclude(
-            pickup_longitude__isnull=True)
+        rides = Ride.objects.select_related("creator", "driver").exclude(status="completed")
 
         nearby_rides = []
         for ride in rides:
@@ -288,11 +279,10 @@ class RideDetailView(ProfileRequiredMixin, DetailView):
         """Add related ride participants and messages."""
         context = super().get_context_data(**kwargs)
         context["participants"] = RideParticipant.objects.filter(ride=self.object).select_related(
-            "passenger"
-        )
+            "passenger")
+
         context["messages"] = RideMessage.objects.filter(ride=self.object).select_related(
-            "sender"
-        ).order_by("-timestamp")
+            "sender").order_by("-timestamp")
         context["google_maps_api_key"] = settings.GOOGLE_MAPS_API_KEY
         my_profile = None
         already_joined = False
@@ -300,8 +290,7 @@ class RideDetailView(ProfileRequiredMixin, DetailView):
             my_profile = Profile.objects.filter(user=self.request.user).first()
             already_joined = RideParticipant.objects.filter(
                 ride=self.object,
-                passenger=my_profile,
-            ).exists() if my_profile else False
+                passenger=my_profile,).exists() if my_profile else False
 
         context["my_profile"] = my_profile
         context["already_joined"] = already_joined
@@ -473,9 +462,6 @@ def join_ride(request, pk):
         return redirect("campus_pickup:ride_detail", pk=ride.pk)
 
     passenger = Profile.objects.filter(user=request.user).first()
-    if not passenger:
-        return redirect("campus_pickup:profile_create")
-
     join_role = request.POST.get("join_role")
 
     if join_role == "driver" and ride.driver is None and passenger != ride.creator:
@@ -509,11 +495,6 @@ def quit_ride(request, pk):
         return redirect("campus_pickup:ride_detail", pk=ride.pk)
 
     profile = Profile.objects.filter(user=request.user).first()
-    if not profile:
-        return redirect("campus_pickup:profile_create")
-
-    if ride.creator == profile:
-        return redirect("campus_pickup:ride_detail", pk=ride.pk)
 
     if ride.driver == profile:
         # Quitting as driver reopens the ride for another driver.
